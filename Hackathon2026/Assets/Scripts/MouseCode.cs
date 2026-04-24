@@ -80,19 +80,20 @@ public class MouseCode : MonoBehaviour
                 newTile = tile;
             }                       
         }
-        if(usedTiles.Contains(newTile)){
-            holdingBlock.transform.position = oldBlockPosition;
-            return;
-        }
-        Vector3 tilePosition = closestTile.transform.position;
-        if(tilePosition.x != blockPosition.x || tilePosition.y != blockPosition.y){
-            Loop loopBlock = closestTile.GetComponent<Loop>();
+        Loop loopBlock = closestTile.GetComponent<Loop>();
             Block inputVarBlock = holdingBlock.GetComponent<Block>();
             if (loopBlock != null && inputVarBlock != null)
             {
                 Debug.Log("found");
                 loopBlock.Compute(inputVarBlock);
             }
+        if(usedTiles.Contains(newTile)){
+            holdingBlock.transform.position = oldBlockPosition;
+            return;
+        }
+        Vector3 tilePosition = closestTile.transform.position;
+        if(tilePosition.x != blockPosition.x || tilePosition.y != blockPosition.y){
+            
             holdingBlock.transform.position = new Vector3(tilePosition.x, tilePosition.y, 0f);
             usedTiles.Add(newTile);
             Block blockSleected = holdingBlock.GetComponent<Block>();
