@@ -84,18 +84,14 @@ public class MouseCode : MonoBehaviour
             holdingBlock.transform.position = oldBlockPosition;
             return;
         }
-        Equation eq = closestTile.GetComponent<Equation>();
-        Block inputVarBlock = holdingBlock.GetComponent<Block>();
-        if (eq != null && inputVarBlock != null)
-        {
-            eq.setInputVar(inputVarBlock);
-            eq.Compute();
-        }
         Vector3 tilePosition = closestTile.transform.position;
         if(tilePosition.x != blockPosition.x || tilePosition.y != blockPosition.y){
-            if(eq != null){
-                eq.inputVar = holdingBlock.GetComponent<Block>();
-                eq.Compute();
+            Loop loopBlock = closestTile.GetComponent<Loop>();
+            Block inputVarBlock = holdingBlock.GetComponent<Block>();
+            if (loopBlock != null && inputVarBlock != null)
+            {
+                Debug.Log("found");
+                loopBlock.Compute(inputVarBlock);
             }
             holdingBlock.transform.position = new Vector3(tilePosition.x, tilePosition.y, 0f);
             usedTiles.Add(newTile);
