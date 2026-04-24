@@ -25,7 +25,7 @@ public class Equation : MonoBehaviour
         switch (operation)
         {
             case EOp.EOp_ADD:
-                inputVar.dataValue += constVar.dataValue;
+                inputVar.changeVal(inputVar.getVal() + constVar.getVal());
                 break;
             default:
                 Debug.Log("unknown op" + operation);
