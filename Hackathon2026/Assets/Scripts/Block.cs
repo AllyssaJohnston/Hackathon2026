@@ -1,17 +1,24 @@
 using UnityEngine;
+using TMPro;
 
 public class Block : MonoBehaviour
 {
-    public int dataValue;
+    [SerializeField] int dataValue;
+    [SerializeField] TMP_Text textObj;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        textObj.text = dataValue.ToString();
     }
 
-    // Update is called once per frame
-    void Update()
+    public int getVal()
     {
-        
+        return dataValue;
+    }
+
+    public void changeVal(int newValue)
+    {
+        dataValue = newValue;
+        textObj.text = dataValue.ToString();
     }
 }
