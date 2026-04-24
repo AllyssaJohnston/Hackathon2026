@@ -3,7 +3,7 @@ using UnityEngine;
 public class Equation : MonoBehaviour
 {
     [SerializeField] GameObject gridInputSpot;
-    [SerializeField] Block inputVar;
+    public Block inputVar;
     [SerializeField] Block constVar;
     [SerializeField] EOp operation;
 

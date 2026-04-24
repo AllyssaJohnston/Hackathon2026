@@ -1,12 +1,16 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections.Generic;
 
 public class MouseCode : MonoBehaviour
 {
     private Vector3 mousePosition;
+    private Vector3 oldBlockPosition;
     public GameObject holdingBlock;
     public GameObject grid;
     private GridTileCode[] tiles;
+    private List<GridTileCode> usedTiles;
+    private int layer;
     private bool grabbingBlock = false;
 
     int blockLayer;
@@ -16,6 +20,7 @@ public class MouseCode : MonoBehaviour
     {
         blockLayer = LayerMask.NameToLayer("Block");
         tiles = grid.GetComponentsInChildren<GridTileCode>();
+        usedTiles = new List<GridTileCode>();
     }
 
     // Update is called once per frame
@@ -32,7 +37,10 @@ public class MouseCode : MonoBehaviour
                 SelectBlock(mousePosition);
             }
             else {
-                AdjustBlockToClosestTile();
+                if(holdingBlock != null){
+                    AdjustBlockToClosestTile();
+                    holdingBlock = null;
+                }
             }
         }
         if(grabbingBlock){
@@ -49,6 +57,7 @@ public class MouseCode : MonoBehaviour
         Collider2D collider = Physics2D.OverlapPoint(position);
         if (collider != null && collider.gameObject.layer == blockLayer){
             holdingBlock = collider.gameObject;
+            oldBlockPosition = holdingBlock.transform.position;
         }
         else {
             holdingBlock = null;
@@ -59,12 +68,21 @@ public class MouseCode : MonoBehaviour
         if (holdingBlock == null) { return; }
         double closestPosition = double.MaxValue;
         GameObject closestTile = null;
+        
+        Vector3 blockPosition = holdingBlock.transform.position;
+        GridTileCode newTile = null;
+
         foreach(GridTileCode tile in tiles){
             double tempDistance = Distance(tile);
             if (closestPosition > tempDistance){
                 closestPosition = tempDistance;
                 closestTile = tile.gameObject;
-            }                            
+                newTile = tile;
+            }                       
+        }
+        if(usedTiles.Contains(newTile)){
+            holdingBlock.transform.position = oldBlockPosition;
+            return;
         }
         Equation eq = closestTile.GetComponent<Equation>();
         Block inputVarBlock = holdingBlock.GetComponent<Block>();
@@ -73,7 +91,21 @@ public class MouseCode : MonoBehaviour
             eq.setInputVar(inputVarBlock);
             eq.Compute();
         }
-        holdingBlock.transform.position = new Vector3(closestTile.transform.position.x, closestTile.transform.position.y, 0f);
+        Vector3 tilePosition = closestTile.transform.position;
+        if(tilePosition.x != blockPosition.x || tilePosition.y != blockPosition.y){
+            if(eq != null){
+                eq.inputVar = holdingBlock.GetComponent<Block>();
+                eq.Compute();
+            }
+            holdingBlock.transform.position = new Vector3(tilePosition.x, tilePosition.y, 0f);
+            usedTiles.Add(newTile);
+            Block blockSleected = holdingBlock.GetComponent<Block>();
+            if(blockSleected.pastTile != null){
+                usedTiles.Remove(blockSleected.pastTile);
+            }
+            blockSleected.pastTile = newTile;
+        }
+        
     }
 
     double Distance(GridTileCode tile){
