@@ -22,7 +22,9 @@ public class MouseCode : MonoBehaviour
         mousePosition.Set(mousePosition.x, mousePosition.y, 0f);
 
         if(Mouse.current.leftButton.wasPressedThisFrame){
-            grabbingBlock = !grabbingBlock;
+            if(CheckForBlock(mousePosition)){
+                grabbingBlock = !grabbingBlock;
+            }
             if(grabbingBlock){
                 SelectBlock(mousePosition);
             }
@@ -34,11 +36,19 @@ public class MouseCode : MonoBehaviour
         }
     }
 
+    bool CheckForBlock(Vector3 position){
+        Collider2D collider = Physics2D.OverlapPoint(position);
+        return collider != null;
+    }
+
     void SelectBlock(Vector3 position){
         Debug.Log("Selecting");
         Collider2D collider = Physics2D.OverlapPoint(position);
         if(collider != null){
             holdingBlock = collider.gameObject;
+        }
+        else {
+            holdingBlock = null;
         }
     }
 
