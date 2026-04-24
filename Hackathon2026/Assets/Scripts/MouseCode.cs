@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.InputSystem;
 
 public class MouseCode : MonoBehaviour
@@ -8,13 +7,14 @@ public class MouseCode : MonoBehaviour
     public GameObject holdingBlock;
     public GameObject grid;
     private GridTileCode[] tiles;
-    private int layer;
     private bool grabbingBlock = false;
-    private bool hoveringOverTile = false;
+
+    int blockLayer;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        layer = LayerMask.NameToLayer("Block");
+        blockLayer = LayerMask.NameToLayer("Block");
         tiles = grid.GetComponentsInChildren<GridTileCode>();
     }
 
@@ -42,15 +42,12 @@ public class MouseCode : MonoBehaviour
         }
     }
 
-    bool CheckForBlock(Vector3 position){
-        Collider2D collider = Physics2D.OverlapPoint(position);
-        return collider != null;
-    }
+    bool CheckForBlock(Vector3 position) { return Physics2D.OverlapPoint(position) != null; }
 
+    // set the input block the mouse is currently hovering over
     void SelectBlock(Vector3 position){
-        Debug.Log("Selecting");
         Collider2D collider = Physics2D.OverlapPoint(position);
-        if(collider != null){
+        if (collider != null && collider.gameObject.layer == blockLayer){
             holdingBlock = collider.gameObject;
         }
         else {
@@ -59,35 +56,33 @@ public class MouseCode : MonoBehaviour
     }
 
     void AdjustBlockToClosestTile(){
+        if (holdingBlock == null) { return; }
         double closestPosition = double.MaxValue;
         GameObject closestTile = null;
-        Vector3 tilePosition = new Vector3(0,0,0);
         foreach(GridTileCode tile in tiles){
             double tempDistance = Distance(tile);
-            if(closestPosition > tempDistance){
+            if (closestPosition > tempDistance){
                 closestPosition = tempDistance;
-                tilePosition = tile.transform.position;
                 closestTile = tile.gameObject;
             }                            
         }
         Equation eq = closestTile.GetComponent<Equation>();
-        if(eq != null){
-            eq.inputVar = holdingBlock.GetComponent<Block>();
+        Block inputVarBlock = holdingBlock.GetComponent<Block>();
+        if (eq != null && inputVarBlock != null)
+        {
+            eq.setInputVar(inputVarBlock);
             eq.Compute();
         }
-        holdingBlock.transform.position = new Vector3(tilePosition.x, tilePosition.y, 0f);
+        holdingBlock.transform.position = new Vector3(closestTile.transform.position.x, closestTile.transform.position.y, 0f);
     }
 
     double Distance(GridTileCode tile){
         Vector3 blockPosition = holdingBlock.transform.position;
         float xDistance = blockPosition.x - tile.transform.position.x;
         float yDistance = blockPosition.y - tile.transform.position.y;
-        double distance = Mathf.Sqrt(Mathf.Pow(xDistance, 2) + Mathf.Pow(yDistance, 2));
-        return distance;
+        return Mathf.Sqrt(Mathf.Pow(xDistance, 2) + Mathf.Pow(yDistance, 2));
     }
 
-    void UpdateBlockPosition(){
-        //temporary object grab
-        holdingBlock.transform.position = mousePosition;
-    }
+    //temporary object grab
+    void UpdateBlockPosition() { holdingBlock.transform.position = mousePosition; }
 }
