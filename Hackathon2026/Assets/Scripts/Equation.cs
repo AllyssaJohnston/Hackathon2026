@@ -1,0 +1,36 @@
+using UnityEngine;
+
+public class Equation : MonoBehaviour
+{
+    [SerializeField] GameObject gridInputSpot;
+    [SerializeField] Block inputVar;
+    [SerializeField] Block constVar;
+    [SerializeField] EOp operation;
+
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
+    {
+        gridInputSpot.GetComponent<SpriteRenderer>().color = Color.green;
+        Debug.Log("changed color");
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+
+    void Compute()
+    {
+        switch (operation)
+        {
+            case EOp.EOp_ADD:
+                inputVar.dataValue += constVar.dataValue;
+                break;
+            default:
+                Debug.Log("unknown op" + operation);
+                break;
+        }
+
+    }
+}
