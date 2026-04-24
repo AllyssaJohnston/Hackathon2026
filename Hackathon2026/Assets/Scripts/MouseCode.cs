@@ -6,6 +6,8 @@ public class MouseCode : MonoBehaviour
 {
     private Vector3 mousePosition;
     public GameObject holdingBlock;
+    public GameObject grid;
+    private GridTileCode[] tiles;
     private int layer;
     private bool grabbingBlock = false;
     private bool hoveringOverTile = false;
@@ -13,6 +15,7 @@ public class MouseCode : MonoBehaviour
     void Start()
     {
         layer = LayerMask.NameToLayer("Block");
+        tiles = grid.GetComponentsInChildren<GridTileCode>();
     }
 
     // Update is called once per frame
@@ -27,6 +30,9 @@ public class MouseCode : MonoBehaviour
             }
             if(grabbingBlock){
                 SelectBlock(mousePosition);
+            }
+            else {
+                AdjustBlockToClosestTile();
             }
         }
         if(grabbingBlock){
@@ -50,6 +56,34 @@ public class MouseCode : MonoBehaviour
         else {
             holdingBlock = null;
         }
+    }
+
+    void AdjustBlockToClosestTile(){
+        double closestPosition = double.MaxValue;
+        GameObject closestTile = null;
+        Vector3 tilePosition = new Vector3(0,0,0);
+        foreach(GridTileCode tile in tiles){
+            double tempDistance = Distance(tile);
+            if(closestPosition > tempDistance){
+                closestPosition = tempDistance;
+                tilePosition = tile.transform.position;
+                closestTile = tile.gameObject;
+            }                            
+        }
+        Equation eq = closestTile.GetComponent<Equation>();
+        if(eq != null){
+            eq.inputVar = holdingBlock.GetComponent<Block>();
+            eq.Compute();
+        }
+        holdingBlock.transform.position = new Vector3(tilePosition.x, tilePosition.y, 0f);
+    }
+
+    double Distance(GridTileCode tile){
+        Vector3 blockPosition = holdingBlock.transform.position;
+        float xDistance = blockPosition.x - tile.transform.position.x;
+        float yDistance = blockPosition.y - tile.transform.position.y;
+        double distance = Mathf.Sqrt(Mathf.Pow(xDistance, 2) + Mathf.Pow(yDistance, 2));
+        return distance;
     }
 
     void UpdateBlockPosition(){
