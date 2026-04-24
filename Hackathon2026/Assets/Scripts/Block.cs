@@ -11,10 +11,7 @@ public class Block : MonoBehaviour
         textObj.text = dataValue.ToString();
     }
 
-    public int getVal()
-    {
-        return dataValue;
-    }
+    public int getVal() { return dataValue; }
 
     public void changeVal(int newValue)
     {

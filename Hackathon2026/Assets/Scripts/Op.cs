@@ -24,6 +24,18 @@ public class Op : MonoBehaviour
             case EOp.EOp_ADD:
                 textObj.text = "+=";
                 break;
+            case EOp.EOp_SUB:
+                textObj.text = "-=";
+                break;
+            case EOp.EOp_MUL:
+                textObj.text = "*=";
+                break;
+            case EOp.EOp_DIV:
+                textObj.text = "/=";
+                break;
+            case EOp.EOp_MOD:
+                textObj.text = "%=";
+                break;
             default:
                 Debug.Log("unknown op" + op);
                 break;
