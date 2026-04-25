@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 
+// block tile
 public class Block : MonoBehaviour
 {
     [SerializeField] int dataValue;
