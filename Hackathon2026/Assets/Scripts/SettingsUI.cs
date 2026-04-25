@@ -5,11 +5,7 @@ public class SettingsUI : MonoBehaviour
 {
     [SerializeField] private GameObject settingsPanel;
     [SerializeField] private Text sfxValueText;
-    [SerializeField] private Text textSizeValueText;
     [SerializeField] private Button toggleSFXButton;
-    [SerializeField] private Button smallTextButton;
-    [SerializeField] private Button mediumTextButton;
-    [SerializeField] private Button largeTextButton;
     [SerializeField] private Button resetProgressButton;
     [SerializeField] private Button backButton;
 
@@ -21,9 +17,6 @@ public class SettingsUI : MonoBehaviour
         }
 
         toggleSFXButton.onClick.AddListener(ToggleSFX);
-        smallTextButton.onClick.AddListener(delegate { SetTextSize(0); });
-        mediumTextButton.onClick.AddListener(delegate { SetTextSize(1); });
-        largeTextButton.onClick.AddListener(delegate { SetTextSize(2); });
         resetProgressButton.onClick.AddListener(ResetProgress);
         backButton.onClick.AddListener(Hide);
 
@@ -56,9 +49,8 @@ public class SettingsUI : MonoBehaviour
 
     private bool HasRequiredReferences()
     {
-        if (settingsPanel == null || sfxValueText == null || textSizeValueText == null ||
-            toggleSFXButton == null || smallTextButton == null || mediumTextButton == null ||
-            largeTextButton == null || resetProgressButton == null || backButton == null)
+        if (settingsPanel == null || sfxValueText == null || toggleSFXButton == null || 
+            resetProgressButton == null || backButton == null)
         {
             Debug.LogError("SettingsUI is missing one or more Inspector references.", this);
             return false;
@@ -74,13 +66,6 @@ public class SettingsUI : MonoBehaviour
         RefreshLabels();
     }
 
-    private void SetTextSize(int size)
-    {
-        PlayerData.TextSize = size;
-        PlayerData.Save();
-        RefreshLabels();
-    }
-
     private void ResetProgress()
     {
         PlayerData.ResetProgress();
@@ -92,22 +77,6 @@ public class SettingsUI : MonoBehaviour
         if (sfxValueText != null)
         {
             sfxValueText.text = "Game SFX: " + (PlayerData.SFXOn ? "On" : "Off");
-        }
-
-        if (textSizeValueText != null)
-        {
-            string sizeName = "Medium";
-
-            if (PlayerData.TextSize == 0)
-            {
-                sizeName = "Small";
-            }
-            else if (PlayerData.TextSize == 2)
-            {
-                sizeName = "Large";
-            }
-
-            textSizeValueText.text = "Text Size: " + sizeName;
         }
     }
 }
