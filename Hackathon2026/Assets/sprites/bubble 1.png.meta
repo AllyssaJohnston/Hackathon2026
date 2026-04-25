@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 8552358204a504c7f8a0ecc9ad9e4418
+guid: 5b012aaa2e9b6b649a7c0759e1751004
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 5128089619724660714
-    second: ArrowTutorial_0
+      213: -8411930236593445216
+    second: bubble 1_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ArrowTutorial_0
+      name: bubble 1_0
       rect:
         serializedVersion: 2
-        x: 256
-        y: 234
-        width: 768
-        height: 836
+        x: 13
+        y: 81
+        width: 1377
+        height: 1014
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: aef6e00e652aa2740800000000000000
-      internalID: 5128089619724660714
+      spriteID: 0a6ea74a402d24b80800000000000000
+      internalID: -8411930236593445216
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      ArrowTutorial_0: 5128089619724660714
+      bubble 1_0: -8411930236593445216
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
