@@ -218,9 +218,9 @@ public class GameplayManager : MonoBehaviour
     private void RefreshUI()
     {
         levelNumberText.text = "Level " + currentLevelNumber;
-        startValueText.text = "Start Value: " + currentLevel.startValue;
-        targetValueText.text = "Target Value: " + currentLevel.targetValue;
-        currentValueText.text = "Current Value: " + currentValue;
+        startValueText.text =  currentLevel.startValue.ToString();
+        targetValueText.text = currentLevel.targetValue.ToString();
+        currentValueText.text = currentValue.ToString();
     }
 
     // set the input block the mouse is currently hovering over
