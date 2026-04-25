@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -13,10 +11,12 @@ public struct Level
     public int targetValue;
     public LoopDetails[] loops;
     [HideInInspector] public List<Loop> blockLoopOpts;
+    public string hint;
 }
 
 public class GameplayManager : MonoBehaviour
 {
+    public static bool init = false;
     [SerializeField] private Text levelNumberText;
     [SerializeField] private Text startValueText;
     [SerializeField] private Text targetValueText;
@@ -42,7 +42,7 @@ public class GameplayManager : MonoBehaviour
     Vector3 selectedBlockPos = Vector3.zero;
 
     [SerializeField] Level[] levels;
-    [SerializeField] Level currentLevel;
+    Level currentLevel;
     int currentLevelNumber;
 
     int currentValue;
@@ -55,6 +55,11 @@ public class GameplayManager : MonoBehaviour
             return;
         }
 
+        if (!init)
+        {
+            PlayerData.ResetProgress();
+            init = true;
+        }
         CreateLevels();
         LoadCurrentLevel();
 
@@ -64,7 +69,7 @@ public class GameplayManager : MonoBehaviour
         backButton.onClick.AddListener(BackToLevelSelect);
     }
 
-   
+
     // Update is called once per frame
     void Update()
     {
@@ -99,9 +104,9 @@ public class GameplayManager : MonoBehaviour
             {
                 Vector3 curLoc = Vector3.zero; 
                 l.blockLoopOpts.Add(Instantiate(loopPrefab).GetComponent<Loop>());
+                l.blockLoopOpts[i].gameObject.SetActive(false);
                 l.blockLoopOpts[i].transform.parent = blockPoolZone.transform;
                 l.blockLoopOpts[i].transform.localPosition = loc;
-                l.blockLoopOpts[i].gameObject.SetActive(true);
                 l.blockLoopOpts[i].numRepeat = l.loops[i].numRepeat;
                 int numLines = l.loops[i].eqDetails.Length;
                 if (l.blockLoopOpts[i].numRepeat > 1)
@@ -127,41 +132,29 @@ public class GameplayManager : MonoBehaviour
                 Vector2 oldSize = l.blockLoopOpts[i].GetComponent<BoxCollider2D>().size;
                 l.blockLoopOpts[i].GetComponent<BoxCollider2D>().size *= new Vector2(1, numLines);
                 l.blockLoopOpts[i].GetComponent<BoxCollider2D>().offset = Vector2.up * -1 * (l.blockLoopOpts[i].GetComponent<BoxCollider2D>().size - oldSize) / 2;
-                if (l.blockLoopOpts[i].equations.Count() == 1)
+                if (numLines == 1)
                 {
                     l.blockLoopOpts[i].loopBar.enabled = false;
                 }
                 else
                 {
                     l.blockLoopOpts[i].loopBar.transform.localScale *= new Vector2(1, numLines);
-                    l.blockLoopOpts[i].loopBar.transform.localPosition += Vector3.up * -1 * l.blockLoopOpts[i].loopBar.sprite.bounds.size.y / 2;
+                    l.blockLoopOpts[i].loopBar.transform.localPosition += Vector3.up * -1 * (l.blockLoopOpts[i].loopBar.sprite.bounds.size.y - oldSize.y) / 2;
                 }
             }
         }
     }
-
-    //private void CreateLevels()
-    //{
-    //    levels = new Level[]
-    //    {
-    //        Level(0, 5, new EquationStruct[] { EquationStruct(blockPrefab.Clone(), } //, "Use = 5 to set x to the target."),
-    //        Level(1, 3, new EquationStruct[] { "+= 2" }, "Add 2 to x."),
-    //        Level(2, 6, new EquationStruct[] { "+= 4" }, "Add 4 to x."),
-    //        Level(5, 2, new EquationStruct[] { "-= 3" }, "Subtract 3 from x."),
-    //        Level(10, 4, new EquationStruct[] { "-= 6" }, "Subtract 6 from x."),
-    //        Level(3, 9, new EquationStruct[] { "*= 3" }, "Multiply x by 3."),
-    //        Level(2, 10, new EquationStruct[] { "+= 3", "*= 2" }, "Try += 3, then *= 2."),
-    //        Level(4, 7, new EquationStruct[] { "*= 2", "-= 1" }, "Try *= 2, then -= 1."),
-    //        Level(1, 8, new EquationStruct[] { "+= 3", "*= 2" }, "Try += 3, then *= 2."),
-    //        Level(6, 10, new EquationStruct[] { "-= 1", "*= 2" }, "Try -= 1, then *= 2.")
-    //    };
-    //}
 
     private void LoadCurrentLevel()
     {
         currentLevelNumber = PlayerData.CurrentLevel;
         currentLevel = levels[currentLevelNumber - 1];
         currentValue = currentLevel.startValue;
+
+        foreach (Loop l in currentLevel.blockLoopOpts)
+        {
+            l.gameObject.SetActive(true);
+        }
 
         numSelectedBlocks = 0;
         numSelectedLines = 0;
@@ -203,7 +196,7 @@ public class GameplayManager : MonoBehaviour
 
     private void UnlockNextLevel()
     {
-        if (currentLevelNumber == PlayerData.LevelsUnlocked && currentLevelNumber < levels.Length - 1)
+        if (currentLevelNumber == PlayerData.LevelsUnlocked && currentLevelNumber < levels.Length)
         {
             PlayerData.LevelsUnlocked = currentLevelNumber + 1;
             PlayerData.Save();
@@ -226,7 +219,7 @@ public class GameplayManager : MonoBehaviour
 
     private void ShowHint()
     {
-        //feedbackText.text = currentLevel.hint;
+        feedbackText.text = currentLevel.hint;
     }
 
     private void BackToLevelSelect() { SceneManager.LoadScene("LevelSelect"); }

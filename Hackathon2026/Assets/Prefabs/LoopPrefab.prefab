@@ -250,6 +250,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5359197760585621923, guid: 3192b0c2fbe259148bd65df1f6719aec, type: 3}
+      propertyPath: m_text
+      value: Va
+      objectReference: {fileID: 0}
+    - target: {fileID: 5359197760585621923, guid: 3192b0c2fbe259148bd65df1f6719aec, type: 3}
+      propertyPath: m_fontSize
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 5359197760585621923, guid: 3192b0c2fbe259148bd65df1f6719aec, type: 3}
+      propertyPath: m_margin.y
+      value: -3.062787
+      objectReference: {fileID: 0}
+    - target: {fileID: 5359197760585621923, guid: 3192b0c2fbe259148bd65df1f6719aec, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 100
+      objectReference: {fileID: 0}
     - target: {fileID: 5964778627050931650, guid: 3192b0c2fbe259148bd65df1f6719aec, type: 3}
       propertyPath: dataValue
       value: 2

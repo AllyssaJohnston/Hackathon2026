@@ -1399,7 +1399,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.17, y: 0.019444443}
   m_AnchorMax: {x: 0.82800007, y: 0.13744444}
-  m_AnchoredPosition: {x: -453, y: -0.000061035156}
+  m_AnchoredPosition: {x: -453.00012, y: 0}
   m_SizeDelta: {x: 3, y: 2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1132794342
@@ -2342,7 +2342,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.06, y: 0.86}
   m_AnchorMax: {x: 0.47, y: 0.98}
-  m_AnchoredPosition: {x: 63.158325, y: 16}
+  m_AnchoredPosition: {x: 63.158447, y: 16}
   m_SizeDelta: {x: -245.9166, y: -32}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1506765929
@@ -3181,24 +3181,135 @@ MonoBehaviour:
   codeBlockZone: {fileID: 670374939}
   levels:
   - startValue: 0
-    targetValue: 6
+    targetValue: 8
     loops:
-    - numRepeat: 2
-      eqDetails:
-      - constVar: 1
-        operation: 0
-      - constVar: 2
-        operation: 2
     - numRepeat: 1
       eqDetails:
       - constVar: 1
         operation: 0
     blockLoopOpts: []
-  currentLevel:
-    startValue: 0
-    targetValue: 0
-    loops: []
+    hint: You need 8 blocks
+  - startValue: 1
+    targetValue: 5
+    loops:
+    - numRepeat: 1
+      eqDetails:
+      - constVar: 2
+        operation: 0
     blockLoopOpts: []
+    hint: You need 2 blocks
+  - startValue: 5
+    targetValue: 2
+    loops:
+    - numRepeat: 1
+      eqDetails:
+      - constVar: 2
+        operation: 0
+    - numRepeat: 1
+      eqDetails:
+      - constVar: 3
+        operation: 1
+    blockLoopOpts: []
+    hint: You need 1 block
+  - startValue: 2
+    targetValue: 6
+    loops:
+    - numRepeat: 1
+      eqDetails:
+      - constVar: 2
+        operation: 1
+    - numRepeat: 1
+      eqDetails:
+      - constVar: 4
+        operation: 2
+    blockLoopOpts: []
+    hint: 1 step forward 1 step back
+  - startValue: 4
+    targetValue: 6
+    loops:
+    - numRepeat: 1
+      eqDetails:
+      - constVar: 2
+        operation: 3
+    - numRepeat: 1
+      eqDetails:
+      - constVar: 3
+        operation: 2
+    blockLoopOpts: []
+    hint: 1 step back, 1 step forward
+  - startValue: 4
+    targetValue: 5
+    loops:
+    - numRepeat: 1
+      eqDetails:
+      - constVar: 3
+        operation: 4
+    - numRepeat: 1
+      eqDetails:
+      - constVar: 2
+        operation: 0
+    blockLoopOpts: []
+    hint: '% gives you the remainder'
+  - startValue: 4
+    targetValue: 8
+    loops:
+    - numRepeat: 2
+      eqDetails:
+      - constVar: 2
+        operation: 0
+    blockLoopOpts: []
+    hint: It's a loop!
+  - startValue: 4
+    targetValue: 32
+    loops:
+    - numRepeat: 2
+      eqDetails:
+      - constVar: 4
+        operation: 2
+    - numRepeat: 1
+      eqDetails:
+      - constVar: 2
+        operation: 3
+    blockLoopOpts: []
+    hint: You need 2 blocks
+  - startValue: 10
+    targetValue: 3
+    loops:
+    - numRepeat: 2
+      eqDetails:
+      - constVar: 2
+        operation: 2
+    - numRepeat: 1
+      eqDetails:
+      - constVar: 3
+        operation: 0
+    - numRepeat: 1
+      eqDetails:
+      - constVar: 4
+        operation: 1
+    blockLoopOpts: []
+    hint: Try reaching 0 first
+  - startValue: 4
+    targetValue: -8
+    loops:
+    - numRepeat: 2
+      eqDetails:
+      - constVar: 3
+        operation: 2
+    - numRepeat: 1
+      eqDetails:
+      - constVar: 2
+        operation: 3
+    - numRepeat: 1
+      eqDetails:
+      - constVar: 18
+        operation: 4
+    - numRepeat: 1
+      eqDetails:
+      - constVar: 4
+        operation: 1
+    blockLoopOpts: []
+    hint: You don't need 1 of these
 --- !u!4 &1886506521
 Transform:
   m_ObjectHideFlags: 0
