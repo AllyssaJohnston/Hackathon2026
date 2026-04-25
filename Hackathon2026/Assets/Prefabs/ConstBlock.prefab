@@ -264,12 +264,12 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -1572391234087474867, guid: 585d9927064365746818d048b71b8509, type: 3}
+  m_Sprite: {fileID: 379800744296357440, guid: 42a68ff4d5f64cc0be608ac01b20f9fc, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 5.9, y: 5.72}
+  m_Size: {x: 1.1377778, y: 1.1377778}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -288,4 +288,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Block
   dataValue: 20
   textObj: {fileID: 5359197760585621923}
-  pastTile: {fileID: 0}

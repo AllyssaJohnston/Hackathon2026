@@ -6,8 +6,6 @@ public class LevelSelectUI : MonoBehaviour
 {
     [SerializeField] private Button[] levelButtons;
     [SerializeField] private Button backButton;
-    [SerializeField] private Button settingsButton;
-    [SerializeField] private SettingsUI settingsUI;
 
     private void Awake()
     {
@@ -24,12 +22,11 @@ public class LevelSelectUI : MonoBehaviour
         }
 
         backButton.onClick.AddListener(BackToStartMenu);
-        settingsButton.onClick.AddListener(settingsUI.Show);
     }
 
     private bool HasRequiredReferences()
     {
-        if (levelButtons == null || levelButtons.Length != 10 || backButton == null || settingsButton == null || settingsUI == null)
+        if (levelButtons == null || levelButtons.Length != 10 || backButton == null)
         {
             Debug.LogError("LevelSelectUI is missing one or more Inspector references.", this);
             return false;
