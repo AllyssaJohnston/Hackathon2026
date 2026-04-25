@@ -5,7 +5,7 @@ public class Block : MonoBehaviour
 {
     [SerializeField] int dataValue;
     [SerializeField] TMP_Text textObj;
-    public GridTileCode pastTile;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {

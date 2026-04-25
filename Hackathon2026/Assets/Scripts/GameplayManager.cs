@@ -10,7 +10,7 @@ public struct Level
     public int startValue;
     public int targetValue;
     public EquationDetails[] equations;
-    public List<Equation> blockEquations;
+    [HideInInspector] public List<Equation> blockEquations;
 }
 
 public class GameplayManager : MonoBehaviour
@@ -19,8 +19,6 @@ public class GameplayManager : MonoBehaviour
     [SerializeField] private Text startValueText;
     [SerializeField] private Text targetValueText;
     [SerializeField] private Text currentValueText;
-    [SerializeField] private Transform availableBlockArea;
-    [SerializeField] private Transform codeArea;
     [SerializeField] private Text feedbackText;
     [SerializeField] private Button runButton;
     [SerializeField] private Button resetButton;
@@ -28,10 +26,10 @@ public class GameplayManager : MonoBehaviour
     [SerializeField] private Button backButton;
 
     [SerializeField] private GameObject eqPrefab;
+    [SerializeField] private Transform blockPoolZone;
     [SerializeField] private Transform codeBlockZone;
 
     private Vector3 mousePosition;
-    private int blockLayer;
 
     private readonly List<GameObject> selectedBlocks = new List<GameObject>();
     [SerializeField] Level[] levels;
@@ -55,12 +53,7 @@ public class GameplayManager : MonoBehaviour
         backButton.onClick.AddListener(BackToLevelSelect);
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        blockLayer = LayerMask.NameToLayer("Block");
-    }
-
+   
     // Update is called once per frame
     void Update()
     {
@@ -75,7 +68,7 @@ public class GameplayManager : MonoBehaviour
     private bool HasRequiredReferences()
     {
         if (levelNumberText == null || startValueText == null || targetValueText == null ||
-            currentValueText == null || availableBlockArea == null || codeArea == null ||
+            currentValueText == null  ||
             feedbackText == null || runButton == null || resetButton == null ||
             hintButton == null || backButton == null)
         {
@@ -93,7 +86,9 @@ public class GameplayManager : MonoBehaviour
             // convert data struct into actual block objs
             for (int i = 0; i < l.equations.Length; i++)
             {
-                l.blockEquations[i] = Instantiate(eqPrefab).GetComponent<Equation>();
+                l.blockEquations.Add(Instantiate(eqPrefab).GetComponent<Equation>());
+                l.blockEquations[i].transform.parent = blockPoolZone;
+                l.blockEquations[i].transform.localPosition = Vector3.zero + Vector3.up * -0.7f * (blockPoolZone.childCount - 1);
                 l.blockEquations[i].gameObject.SetActive(true);
                 l.blockEquations[i].constVar.changeVal(l.equations[i].constVar);
                 l.blockEquations[i].operation.op = l.equations[i].operation;
@@ -125,18 +120,9 @@ public class GameplayManager : MonoBehaviour
         currentValue = currentLevel.startValue;
 
         selectedBlocks.Clear();
-        ClearAvailableBlockArea();
         RefreshUI();
 
         feedbackText.text = "Click blocks, then press Run.";
-    }
-
-    private void ClearAvailableBlockArea()
-    {
-        foreach (Transform child in availableBlockArea)
-        {
-            Destroy(child.gameObject);
-        }
     }
 
     private void RunCode()
@@ -175,6 +161,10 @@ public class GameplayManager : MonoBehaviour
         selectedBlocks.Clear();
         currentValue = currentLevel.startValue;
         feedbackText.text = "Level reset.";
+        foreach (Transform child in codeBlockZone)
+        {
+            Destroy(child.gameObject);
+        }
         RefreshUI();
     }
 
