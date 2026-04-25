@@ -47,13 +47,11 @@ public class GameplayManager : MonoBehaviour
 
     int currentValue;
 
-    
+    float blockVertSpacing = .7f;
+
     private void Awake()
     {
-        if (!HasRequiredReferences())
-        {
-            return;
-        }
+        if (!HasRequiredReferences()) { return; }
 
         if (!init)
         {
@@ -113,7 +111,7 @@ public class GameplayManager : MonoBehaviour
                 {
                     l.blockLoopOpts[i].repeatBlock.changeVal(l.blockLoopOpts[i].numRepeat);
                     l.blockLoopOpts[i].repeatBlock.gameObject.SetActive(true);
-                    curLoc += Vector3.up * -0.7f;
+                    curLoc += Vector3.down * blockVertSpacing;
                     numLines++;
                 }
                 foreach(EquationDetails eq in l.loops[i].eqDetails)
@@ -123,7 +121,7 @@ public class GameplayManager : MonoBehaviour
                     eqObj.gameObject.SetActive(true);
                     eqObj.gameObject.transform.parent = l.blockLoopOpts[i].transform;
                     eqObj.gameObject.transform.localPosition = curLoc;
-                    curLoc += Vector3.up * -.7f;
+                    curLoc += Vector3.down * blockVertSpacing;
                     eqObj.constVar.changeVal(eq.constVar);
                     eqObj.operation.op = eq.operation;
                 }
@@ -131,7 +129,7 @@ public class GameplayManager : MonoBehaviour
                 
                 Vector2 oldSize = l.blockLoopOpts[i].GetComponent<BoxCollider2D>().size;
                 l.blockLoopOpts[i].GetComponent<BoxCollider2D>().size *= new Vector2(1, numLines);
-                l.blockLoopOpts[i].GetComponent<BoxCollider2D>().offset = Vector2.up * -1 * (l.blockLoopOpts[i].GetComponent<BoxCollider2D>().size - oldSize) / 2;
+                l.blockLoopOpts[i].GetComponent<BoxCollider2D>().offset = Vector2.down * (l.blockLoopOpts[i].GetComponent<BoxCollider2D>().size - oldSize) / 2;
                 if (numLines == 1)
                 {
                     l.blockLoopOpts[i].loopBar.enabled = false;
@@ -139,7 +137,7 @@ public class GameplayManager : MonoBehaviour
                 else
                 {
                     l.blockLoopOpts[i].loopBar.transform.localScale *= new Vector2(1, numLines);
-                    l.blockLoopOpts[i].loopBar.transform.localPosition += Vector3.up * -1 * (l.blockLoopOpts[i].loopBar.sprite.bounds.size.y - oldSize.y) / 2;
+                    l.blockLoopOpts[i].loopBar.transform.localPosition += Vector3.down * (l.blockLoopOpts[i].loopBar.sprite.bounds.size.y - oldSize.y) / 2;
                 }
             }
         }
@@ -167,18 +165,9 @@ public class GameplayManager : MonoBehaviour
     private void RunCode()
     {
         currentValue = currentLevel.startValue;
-
         for (int i = 0; i < numSelectedBlocks; i++)
         {
-            Loop loopScr = selectedBlocks[i].GetComponent<Loop>();
-            if (loopScr == null)
-            {
-                currentValue = selectedBlocks[i].GetComponent<Equation>().Compute(currentValue);
-            }
-            else
-            {
-                currentValue = loopScr.Compute(currentValue);
-            }
+            currentValue = selectedBlocks[i].GetComponent<Loop>().Compute(currentValue);
         }
 
         if (currentValue == currentLevel.targetValue)
@@ -217,10 +206,7 @@ public class GameplayManager : MonoBehaviour
         RefreshUI();
     }
 
-    private void ShowHint()
-    {
-        feedbackText.text = currentLevel.hint;
-    }
+    private void ShowHint() { feedbackText.text = currentLevel.hint; }
 
     private void BackToLevelSelect() { SceneManager.LoadScene("LevelSelect"); }
 
@@ -237,30 +223,26 @@ public class GameplayManager : MonoBehaviour
     {
         if (numSelectedLines >= maxCodeBlocks)
         {
-            return;
+            return; // no room for block
         }
         Collider2D collider = Physics2D.OverlapPoint(position);
         if (collider != null)
         {
             GameObject curObject = collider.gameObject;
             Loop loopScr = curObject.GetComponent<Loop>();
-            int numLines = 1;
-            if (loopScr != null)
+            int numLines = loopScr.equations.Count;
+            if (loopScr.numRepeat > 1)
             {
-                numLines = loopScr.equations.Count;
-                if (loopScr.numRepeat > 1)
-                {
-                    numLines++;
-                }
-                if (numSelectedLines + numLines > maxCodeBlocks)
-                {
-                    return;
-                }
+                numLines++;
+            }
+            if (numSelectedLines + numLines > maxCodeBlocks)
+            {
+                return; // no room for block
             }
             GameObject newEq = Instantiate(curObject);
             newEq.transform.parent = codeBlockZone;
             newEq.transform.localPosition = selectedBlockPos;
-            selectedBlockPos += numLines * (Vector3.up * -0.7f);
+            selectedBlockPos += numLines * (Vector3.down * blockVertSpacing);
 
             GameObject.Destroy(selectedBlocks[numSelectedBlocks]); // safe to call on null
             selectedBlocks[numSelectedBlocks] = newEq;
