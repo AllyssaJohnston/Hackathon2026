@@ -15,14 +15,17 @@ public class Loop : MonoBehaviour
     public SpriteRenderer loopBar;
     public Block repeatBlock;
     public Vector2 size;
+    public string loopString;
 
     public int Compute(int inputVar)
     {
+        loopString = "";
         for (int i = 0; i < numRepeat; i++)
         {
             foreach(Equation eq in equations)
             {
                 inputVar = eq.Compute(inputVar);
+                loopString += eq.equation;
             }
         }
         return inputVar;

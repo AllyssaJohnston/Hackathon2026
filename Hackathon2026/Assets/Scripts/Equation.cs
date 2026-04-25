@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections.Generic;
 
 [System.Serializable]
 public struct EquationDetails
@@ -12,15 +11,14 @@ public class Equation : MonoBehaviour
 {
     public Block constVar;
     public Op operation;
-    private string equation;
+    public string equation;
     private string comment;
-    public CStringCode logger;
 
     public int Compute(int inputVar)
     {
         int prevVal = inputVar;
-        equation += "x" + " ";
-        comment += inputVar + " ";
+        equation = "x" + " ";
+        comment = inputVar + " ";
         switch (operation.op)
         {
             case EOp.EOp_ADD:
@@ -53,8 +51,7 @@ public class Equation : MonoBehaviour
                 break;
         }
         Debug.Log(prevVal.ToString() + " to " + inputVar.ToString());
-        equation += " //" + comment;
-        logger.AddEquation(equation);
+        equation += "   //" + comment;
         return inputVar;
     }
 }

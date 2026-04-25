@@ -33,6 +33,7 @@ public class GameplayManager : MonoBehaviour
     [SerializeField] private Transform blockPoolZone;
     [SerializeField] private Transform codeBlockZone;
 
+    [SerializeField] private CStringCode logger;
     Vector3 mousePosition;
 
     const int maxCodeBlocks = 8;
@@ -164,10 +165,12 @@ public class GameplayManager : MonoBehaviour
 
     private void RunCode()
     {
+        logger.DeleteTextBox();
         currentValue = currentLevel.startValue;
         for (int i = 0; i < numSelectedBlocks; i++)
         {
             currentValue = selectedBlocks[i].GetComponent<Loop>().Compute(currentValue);
+            logger.AddEquation(selectedBlocks[i].GetComponent<Loop>().loopString);
         }
 
         if (currentValue == currentLevel.targetValue)
@@ -180,6 +183,7 @@ public class GameplayManager : MonoBehaviour
             feedbackText.text = "x did not reach the target.";
         }
 
+        logger.PrintMethod();
         RefreshUI();
     }
 
@@ -203,6 +207,7 @@ public class GameplayManager : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
+        logger.DeleteTextBox();
         RefreshUI();
     }
 
