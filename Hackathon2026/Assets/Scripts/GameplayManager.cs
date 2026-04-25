@@ -1,35 +1,39 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+[System.Serializable]
+public struct Level
+{
+    public int startValue;
+    public int targetValue;
+    public EquationDetails[] equations;
+    [HideInInspector] public List<Equation> blockEquations;
+}
+
 public class GameplayManager : MonoBehaviour
 {
-    private struct Level
-    {
-        public int startValue;
-        public int targetValue;
-        public string[] blocks;
-        public string hint;
-    }
-
     [SerializeField] private Text levelNumberText;
     [SerializeField] private Text startValueText;
     [SerializeField] private Text targetValueText;
     [SerializeField] private Text currentValueText;
-    [SerializeField] private Transform availableBlockArea;
-    [SerializeField] private Transform codeArea;
-    [SerializeField] private Text codeAreaText;
     [SerializeField] private Text feedbackText;
     [SerializeField] private Button runButton;
     [SerializeField] private Button resetButton;
     [SerializeField] private Button hintButton;
     [SerializeField] private Button backButton;
-    [SerializeField] private Button blockButtonPrefab;
 
-    private readonly List<string> selectedBlocks = new List<string>();
-    private Level[] levels;
-    private Level currentLevel;
+    [SerializeField] private GameObject eqPrefab;
+    [SerializeField] private Transform blockPoolZone;
+    [SerializeField] private Transform codeBlockZone;
+
+    private Vector3 mousePosition;
+
+    private readonly List<GameObject> selectedBlocks = new List<GameObject>();
+    [SerializeField] Level[] levels;
+    [SerializeField] Level currentLevel;
     private int currentLevelNumber;
     private int currentValue;
 
@@ -49,12 +53,24 @@ public class GameplayManager : MonoBehaviour
         backButton.onClick.AddListener(BackToLevelSelect);
     }
 
+   
+    // Update is called once per frame
+    void Update()
+    {
+        mousePosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+        mousePosition.Set(mousePosition.x, mousePosition.y, 0f);
+        if (Mouse.current.leftButton.wasPressedThisFrame)
+        {
+            SelectBlock(mousePosition);
+        }
+    }
+
     private bool HasRequiredReferences()
     {
         if (levelNumberText == null || startValueText == null || targetValueText == null ||
-            currentValueText == null || availableBlockArea == null || codeArea == null ||
-            codeAreaText == null || feedbackText == null || runButton == null || resetButton == null ||
-            hintButton == null || backButton == null || blockButtonPrefab == null)
+            currentValueText == null  ||
+            feedbackText == null || runButton == null || resetButton == null ||
+            hintButton == null || backButton == null)
         {
             Debug.LogError("GameplayManager is missing one or more Inspector references.", this);
             return false;
@@ -65,30 +81,37 @@ public class GameplayManager : MonoBehaviour
 
     private void CreateLevels()
     {
-        levels = new Level[]
+        foreach(Level l in levels)
         {
-            NewLevel(0, 5, new string[] { "= 5" }, "Use = 5 to set x to the target."),
-            NewLevel(1, 3, new string[] { "+= 2" }, "Add 2 to x."),
-            NewLevel(2, 6, new string[] { "+= 4" }, "Add 4 to x."),
-            NewLevel(5, 2, new string[] { "-= 3" }, "Subtract 3 from x."),
-            NewLevel(10, 4, new string[] { "-= 6" }, "Subtract 6 from x."),
-            NewLevel(3, 9, new string[] { "*= 3" }, "Multiply x by 3."),
-            NewLevel(2, 10, new string[] { "+= 3", "*= 2" }, "Try += 3, then *= 2."),
-            NewLevel(4, 7, new string[] { "*= 2", "-= 1" }, "Try *= 2, then -= 1."),
-            NewLevel(1, 8, new string[] { "+= 3", "*= 2" }, "Try += 3, then *= 2."),
-            NewLevel(6, 10, new string[] { "-= 1", "*= 2" }, "Try -= 1, then *= 2.")
-        };
+            // convert data struct into actual block objs
+            for (int i = 0; i < l.equations.Length; i++)
+            {
+                l.blockEquations.Add(Instantiate(eqPrefab).GetComponent<Equation>());
+                l.blockEquations[i].transform.parent = blockPoolZone;
+                l.blockEquations[i].transform.localPosition = Vector3.zero + Vector3.up * -0.7f * (blockPoolZone.childCount - 1);
+                l.blockEquations[i].gameObject.SetActive(true);
+                l.blockEquations[i].constVar.changeVal(l.equations[i].constVar);
+                l.blockEquations[i].operation.op = l.equations[i].operation;
+            }
+        }
     }
 
-    private Level NewLevel(int startValue, int targetValue, string[] blocks, string hint)
-    {
-        Level level = new Level();
-        level.startValue = startValue;
-        level.targetValue = targetValue;
-        level.blocks = blocks;
-        level.hint = hint;
-        return level;
-    }
+    //private void CreateLevels()
+    //{
+    //    levels = new Level[]
+    //    {
+    //        Level(0, 5, new EquationStruct[] { EquationStruct(blockPrefab.Clone(), } //, "Use = 5 to set x to the target."),
+    //        Level(1, 3, new EquationStruct[] { "+= 2" }, "Add 2 to x."),
+    //        Level(2, 6, new EquationStruct[] { "+= 4" }, "Add 4 to x."),
+    //        Level(5, 2, new EquationStruct[] { "-= 3" }, "Subtract 3 from x."),
+    //        Level(10, 4, new EquationStruct[] { "-= 6" }, "Subtract 6 from x."),
+    //        Level(3, 9, new EquationStruct[] { "*= 3" }, "Multiply x by 3."),
+    //        Level(2, 10, new EquationStruct[] { "+= 3", "*= 2" }, "Try += 3, then *= 2."),
+    //        Level(4, 7, new EquationStruct[] { "*= 2", "-= 1" }, "Try *= 2, then -= 1."),
+    //        Level(1, 8, new EquationStruct[] { "+= 3", "*= 2" }, "Try += 3, then *= 2."),
+    //        Level(6, 10, new EquationStruct[] { "-= 1", "*= 2" }, "Try -= 1, then *= 2.")
+    //    };
+    //}
 
     private void LoadCurrentLevel()
     {
@@ -97,57 +120,18 @@ public class GameplayManager : MonoBehaviour
         currentValue = currentLevel.startValue;
 
         selectedBlocks.Clear();
-        ClearAvailableBlockArea();
-        CreateAvailableBlockButtons();
         RefreshUI();
 
         feedbackText.text = "Click blocks, then press Run.";
-    }
-
-    private void ClearAvailableBlockArea()
-    {
-        foreach (Transform child in availableBlockArea)
-        {
-            if (child.gameObject != blockButtonPrefab.gameObject)
-            {
-                Destroy(child.gameObject);
-            }
-        }
-    }
-
-    private void CreateAvailableBlockButtons()
-    {
-        foreach (string block in currentLevel.blocks)
-        {
-            string selectedBlock = block;
-            Button button = Instantiate(blockButtonPrefab, availableBlockArea);
-            button.gameObject.SetActive(true);
-            button.interactable = true;
-            button.onClick.AddListener(delegate { AddBlock(selectedBlock); });
-
-            Text label = button.GetComponentInChildren<Text>();
-
-            if (label != null)
-            {
-                label.text = selectedBlock;
-            }
-        }
-    }
-
-    private void AddBlock(string block)
-    {
-        selectedBlocks.Add(block);
-        feedbackText.text = "Added " + block + ".";
-        RefreshUI();
     }
 
     private void RunCode()
     {
         currentValue = currentLevel.startValue;
 
-        foreach (string block in selectedBlocks)
+        foreach (GameObject block in selectedBlocks)
         {
-            ApplyBlock(block);
+            currentValue = block.GetComponent<Equation>().Compute(currentValue);
         }
 
         if (currentValue == currentLevel.targetValue)
@@ -161,30 +145,6 @@ public class GameplayManager : MonoBehaviour
         }
 
         RefreshUI();
-    }
-
-    private void ApplyBlock(string block)
-    {
-        string[] parts = block.Split(' ');
-        string operation = parts[0];
-        int number = int.Parse(parts[1]);
-
-        if (operation == "=")
-        {
-            currentValue = number;
-        }
-        else if (operation == "+=")
-        {
-            currentValue += number;
-        }
-        else if (operation == "-=")
-        {
-            currentValue -= number;
-        }
-        else if (operation == "*=")
-        {
-            currentValue *= number;
-        }
     }
 
     private void UnlockNextLevel()
@@ -201,12 +161,16 @@ public class GameplayManager : MonoBehaviour
         selectedBlocks.Clear();
         currentValue = currentLevel.startValue;
         feedbackText.text = "Level reset.";
+        foreach (Transform child in codeBlockZone)
+        {
+            Destroy(child.gameObject);
+        }
         RefreshUI();
     }
 
     private void ShowHint()
     {
-        feedbackText.text = currentLevel.hint;
+        //feedbackText.text = currentLevel.hint;
     }
 
     private void BackToLevelSelect()
@@ -220,6 +184,20 @@ public class GameplayManager : MonoBehaviour
         startValueText.text = "Start Value: " + currentLevel.startValue;
         targetValueText.text = "Target Value: " + currentLevel.targetValue;
         currentValueText.text = "Current Value: " + currentValue;
-        codeAreaText.text = selectedBlocks.Count == 0 ? "No blocks selected." : string.Join("\n", selectedBlocks.ToArray());
     }
+
+    // set the input block the mouse is currently hovering over
+    void SelectBlock(Vector3 position)
+    {
+        Collider2D collider = Physics2D.OverlapPoint(position);
+        if (collider != null)
+        {
+            GameObject curObject = collider.gameObject;
+            GameObject newEq = Instantiate(curObject);
+            newEq.transform.parent = codeBlockZone;
+            newEq.transform.localPosition = Vector3.zero + Vector3.up * -0.7f * (codeBlockZone.childCount - 1);
+            selectedBlocks.Add(newEq);
+        }
+    }
+
 }

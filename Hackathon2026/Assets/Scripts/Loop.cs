@@ -1,43 +1,21 @@
 using UnityEngine;
 
 [System.Serializable]
-public struct EquationStruct
+public struct EquationDetails
 {
-    public Block constVar;
-    public Op operation;
+    public int constVar;
+    public EOp operation;
 
-    public void Compute(Block inputVar)
+    public EquationDetails(int constVar, EOp operation)
     {
-        int prevVal = inputVar.getVal();
-        switch (operation.op)
-        {
-        case EOp.EOp_ADD:
-            inputVar.changeVal(inputVar.getVal() + constVar.getVal());
-            break;
-        case EOp.EOp_SUB:
-            inputVar.changeVal(inputVar.getVal() - constVar.getVal());
-            break;
-        case EOp.EOp_MUL:
-            inputVar.changeVal(inputVar.getVal() * constVar.getVal());
-            break;
-        case EOp.EOp_DIV:
-            inputVar.changeVal(inputVar.getVal() / constVar.getVal());
-            break;
-        case EOp.EOp_MOD:
-            inputVar.changeVal(inputVar.getVal() % constVar.getVal());
-            break;
-        default:
-            Debug.Log("unknown op" + operation);
-            break;
-        }
-        Debug.Log(prevVal.ToString() + " to " + inputVar.getVal().ToString());
+        this.constVar = constVar;
+        this.operation = operation;
     }
 }
 
-
 public class Loop : MonoBehaviour
 {
-    [SerializeField] EquationStruct[] equations;
+    //[SerializeField] EquationStruct[] equations;
     public int numRepeat;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -45,14 +23,14 @@ public class Loop : MonoBehaviour
         GetComponent<SpriteRenderer>().color = Color.green;
     }
 
-    public void Compute(Block inputVar)
+    public void Compute(int inputVar)
     {
         for (int i = 0; i < numRepeat; i++)
         {
-            foreach (EquationStruct eq in equations)
-            {
-                eq.Compute(inputVar);
-            }
+            //foreach (EquationStruct eq in equations)
+            //{
+            //    eq.Compute(inputVar);
+            //}
         }
        
     }
