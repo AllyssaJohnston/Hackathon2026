@@ -34,7 +34,7 @@ Material:
     - _Frequency: 6
     - _Gain: 100
     - _Intensity: 2.4
-    - _OverallBrightness: 1
+    - _OverallBrightness: 2
     - _ReflectionCutOff: 0.012
     - _ReflectionIntensity: 200000
     - _SpeedX: 0.13
