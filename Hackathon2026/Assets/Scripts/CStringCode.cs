@@ -15,6 +15,7 @@ public class CStringCode : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        textElement.gameObject.SetActive(false);
         outputAreaPosition = outputArea.transform.position;
         storage = new List<string>();
         InitializeText();
@@ -22,35 +23,30 @@ public class CStringCode : MonoBehaviour
         deleteButton.onClick.AddListener(DeleteTextBox);
     }
 
-    public void PrintMethod(){
-        foreach(string eq in storage){
+    public void PrintMethod()
+    {
+        foreach (string eq in storage){
             textElement.text += eq + "\n";
         }
+        textElement.gameObject.SetActive(true);
     }
 
     public void AddEquation(string equation){
         storage.Add(equation);
     }
 
-    public void DeleteTextBox(){
-        if(textElement != null){
-            Destroy(textElement);
-        }
-        if(storage != null){
+    public void DeleteTextBox()
+    {
+        textElement.gameObject.SetActive(false);
+        if (storage != null){
             storage.Clear();
         }
-        InitializeText();
     }
 
-    public void InitializeText(){
-        GameObject textObj = new GameObject("MyTMPText");
-        Canvas canvas = FindObjectOfType<Canvas>();
-        if(canvas != null){
-            textObj.transform.SetParent(canvas.transform, false);
-        }
-        textElement = textObj.AddComponent<TextMeshProUGUI>();
+    public void InitializeText()
+    {
         textElement.lineSpacing = 95f;
-        textElement.enableWordWrapping = false;
-        textElement.transform.position = new Vector3(outputAreaPosition.x + 350, outputAreaPosition.y - 155, outputAreaPosition.z);
+        textElement.textWrappingMode = TextWrappingModes.NoWrap;
+        textElement.transform.position = new Vector3(outputAreaPosition.x + 150, outputAreaPosition.y - 120, outputAreaPosition.z);
     }
 }
