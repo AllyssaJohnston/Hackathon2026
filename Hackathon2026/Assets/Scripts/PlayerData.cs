@@ -2,10 +2,20 @@ using UnityEngine;
 
 public class PlayerData : MonoBehaviour
 {
+    private static bool init = false;
     private const string LevelsUnlockedKey = "LevelsUnlocked";
     private const string CurrentLevelKey = "CurrentLevel";
     private const string SFXOnKey = "SFXOn";
     private const string TextSizeKey = "TextSize";
+
+    public void Start()
+    {
+        if (init == false)
+        {
+            ResetProgress();
+            init = true;
+        }
+    }
 
     public static int LevelsUnlocked
     {
