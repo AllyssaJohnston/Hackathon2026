@@ -1,37 +1,30 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 [System.Serializable]
-public struct EquationDetails
+public struct LoopDetails
 {
-    public int constVar;
-    public EOp operation;
-
-    public EquationDetails(int constVar, EOp operation)
-    {
-        this.constVar = constVar;
-        this.operation = operation;
-    }
+    public int numRepeat;
+    public  EquationDetails[] eqDetails;
 }
 
 public class Loop : MonoBehaviour
 {
-    //[SerializeField] EquationStruct[] equations;
-    public int numRepeat;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        GetComponent<SpriteRenderer>().color = Color.green;
-    }
+    public List<Equation> equations;
+    public int numRepeat = 1;
+    public SpriteRenderer loopBar;
+    public Block repeatBlock;
+    public Vector2 size;
 
-    public void Compute(int inputVar)
+    public int Compute(int inputVar)
     {
         for (int i = 0; i < numRepeat; i++)
         {
-            //foreach (EquationStruct eq in equations)
-            //{
-            //    eq.Compute(inputVar);
-            //}
+            foreach(Equation eq in equations)
+            {
+                inputVar = eq.Compute(inputVar);
+            }
         }
-       
+        return inputVar;
     }
 }

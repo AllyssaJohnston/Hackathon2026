@@ -1,4 +1,12 @@
 using UnityEngine;
+using System.Collections.Generic;
+
+[System.Serializable]
+public struct EquationDetails
+{
+    public int constVar;
+    public EOp operation;
+}
 
 public class Equation : MonoBehaviour
 {
