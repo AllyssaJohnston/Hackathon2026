@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 [System.Serializable]
@@ -213,7 +212,15 @@ public class GameplayManager : MonoBehaviour
 
     private void ShowHint() { feedbackText.text = currentLevel.hint; }
 
-    private void BackToLevelSelect() { SceneManager.LoadScene("LevelSelect"); }
+    private void BackToLevelSelect()
+    {
+        if (SceneTransitionManager.Instance.IsTransitioning)
+        {
+            return;
+        }
+
+        SceneTransitionManager.Instance.LoadScene("LevelSelect");
+    }
 
     private void RefreshUI()
     {

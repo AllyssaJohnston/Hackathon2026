@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class MainMenuUI : MonoBehaviour
@@ -34,7 +33,7 @@ public class MainMenuUI : MonoBehaviour
 
     private void Play()
     {
-        SceneManager.LoadScene("LevelSelect");
+        SceneTransitionManager.Instance.LoadScene("LevelSelect");
     }
 
     private void Quit()
