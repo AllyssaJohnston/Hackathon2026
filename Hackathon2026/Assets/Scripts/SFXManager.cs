@@ -145,6 +145,11 @@ public sealed class SFXManager : MonoBehaviour
             return;
         }
 
+        if (!IsClipReadyToPlay(bubbleTransitionClip, BubbleTransitionPath, ref warnedMissingBubbleTransition))
+        {
+            return;
+        }
+
         if (bubbleTransitionFadeCoroutine != null)
         {
             StopCoroutine(bubbleTransitionFadeCoroutine);
@@ -177,7 +182,35 @@ public sealed class SFXManager : MonoBehaviour
             return;
         }
 
+        if (!IsClipReadyToPlay(clip, resourcePath, ref warnedMissingClip))
+        {
+            return;
+        }
+
         sfxSource.PlayOneShot(clip);
+    }
+
+    private static bool IsClipReadyToPlay(AudioClip clip, string resourcePath, ref bool warnedClipUnavailable)
+    {
+        if (clip.loadState == AudioDataLoadState.Loaded)
+        {
+            return true;
+        }
+
+        if (clip.loadState == AudioDataLoadState.Unloaded)
+        {
+            clip.LoadAudioData();
+        }
+
+        if (!warnedClipUnavailable)
+        {
+            warnedClipUnavailable = true;
+            Debug.LogWarning(
+                $"SFXManager skipped AudioClip at Resources path '{resourcePath}' because its audio data is not ready. " +
+                $"loadState={clip.loadState}.");
+        }
+
+        return false;
     }
 
     private System.Collections.IEnumerator FadeOutBubbleTransitionAfterDelay(float stopAfterSeconds, float fadeDurationSeconds)

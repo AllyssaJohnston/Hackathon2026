@@ -16,7 +16,12 @@ public sealed class BubbleOverlayController : MonoBehaviour
     private static readonly int MinBubbleSpeed = Shader.PropertyToID("_MinBubbleSpeed");
     private static readonly int MaxBubbleSpeed = Shader.PropertyToID("_MaxBubbleSpeed");
     private static readonly int ITime = Shader.PropertyToID("_iTime");
+    private static readonly int BubbleTime = Shader.PropertyToID("_BubbleTime");
     private static readonly int BubbleScale = Shader.PropertyToID("_BubbleScale");
+
+    private const float DefaultRiseSpeed = 1f;
+    private const float DefaultMinBubbleSpeed = 0.8f;
+    private const float DefaultMaxBubbleSpeed = 1.3f;
 
     [SerializeField] private RawImage overlayImage;
     [SerializeField] private ShaderToyDriver shaderToyDriver;
@@ -27,15 +32,13 @@ public sealed class BubbleOverlayController : MonoBehaviour
     [SerializeField] private float phaseDuration = 1f;
     [SerializeField] private float holdOpacity = 1f;
     [SerializeField] private float bubbleScale = 1f;
-    [SerializeField] private float introRiseSpeed = 0.30f;
-    [SerializeField] private float autoRiseSpeed = 0.70f;
+    [SerializeField] private float autoRiseSpeed = DefaultRiseSpeed;
 
     private Material runtimeMaterial;
     private Coroutine transitionCoroutine;
     private bool isTransitioning;
 
-    private float IntroRiseSpeed => Mathf.Max(introRiseSpeed, 0.30f);
-    private float NormalRiseSpeed => Mathf.Max(autoRiseSpeed, 0.70f);
+    private float NormalRiseSpeed => Mathf.Max(autoRiseSpeed, DefaultRiseSpeed);
 
     private void Awake()
     {
@@ -90,8 +93,8 @@ public sealed class BubbleOverlayController : MonoBehaviour
         }
 
         isTransitioning = true;
+        ApplyTransitionDefaults();
         Debug.Log($"[BubbleOverlayController] PlayTransition started by {trigger}.", this);
-        LogMaterialState("start");
         float transitionLength = Mathf.Max(0.01f, phaseDuration) * 3f;
         SFXManager.Instance.PlayBubbleTransition(transitionLength - 0.5f, 0.5f);
         transitionCoroutine = StartCoroutine(PlayTransitionCoroutine());
@@ -99,7 +102,10 @@ public sealed class BubbleOverlayController : MonoBehaviour
 
     private IEnumerator PlayTransitionCoroutine()
     {
-        ApplyTransitionDefaults();
+        float bubbleTime = 0f;
+        runtimeMaterial.SetFloat(BubbleTime, bubbleTime);
+        LogMaterialState("transition start");
+        Debug.Log($"[BubbleOverlayController] Starting _RiseSpeed={runtimeMaterial.GetFloat(RiseSpeed):F3}, _BubbleTime={bubbleTime:F3}.", this);
 
         float duration = Mathf.Max(0.01f, phaseDuration);
         Debug.Log("[BubbleOverlayController] Phase 1 start.", this);
@@ -107,11 +113,14 @@ public sealed class BubbleOverlayController : MonoBehaviour
         float elapsed = 0f;
         while (elapsed < duration)
         {
-            elapsed += Time.unscaledDeltaTime;
+            float deltaTime = Time.unscaledDeltaTime;
+            bubbleTime += deltaTime;
+            runtimeMaterial.SetFloat(BubbleTime, bubbleTime);
+            elapsed += deltaTime;
             float t = Mathf.Clamp01(elapsed / duration);
-            runtimeMaterial.SetFloat(BubbleDensity, Mathf.Lerp(0f, bubbleDensity, t));
+            runtimeMaterial.SetFloat(BubbleDensity, bubbleDensity);
             runtimeMaterial.SetFloat(BubbleOpacity, Mathf.Lerp(0f, holdOpacity, t));
-            runtimeMaterial.SetFloat(RiseSpeed, Mathf.Lerp(IntroRiseSpeed, NormalRiseSpeed, t));
+            runtimeMaterial.SetFloat(RiseSpeed, NormalRiseSpeed);
             yield return null;
         }
 
@@ -123,7 +132,13 @@ public sealed class BubbleOverlayController : MonoBehaviour
         elapsed = 0f;
         while (elapsed < duration)
         {
-            elapsed += Time.unscaledDeltaTime;
+            float deltaTime = Time.unscaledDeltaTime;
+            bubbleTime += deltaTime;
+            runtimeMaterial.SetFloat(BubbleTime, bubbleTime);
+            elapsed += deltaTime;
+            runtimeMaterial.SetFloat(BubbleDensity, bubbleDensity);
+            runtimeMaterial.SetFloat(BubbleOpacity, holdOpacity);
+            runtimeMaterial.SetFloat(RiseSpeed, NormalRiseSpeed);
             yield return null;
         }
 
@@ -131,14 +146,18 @@ public sealed class BubbleOverlayController : MonoBehaviour
         elapsed = 0f;
         while (elapsed < duration)
         {
-            elapsed += Time.unscaledDeltaTime;
+            float deltaTime = Time.unscaledDeltaTime;
+            bubbleTime += deltaTime;
+            runtimeMaterial.SetFloat(BubbleTime, bubbleTime);
+            elapsed += deltaTime;
             float t = Mathf.Clamp01(elapsed / duration);
-            runtimeMaterial.SetFloat(BubbleDensity, Mathf.Lerp(bubbleDensity, 0f, t));
+            runtimeMaterial.SetFloat(BubbleDensity, bubbleDensity);
             runtimeMaterial.SetFloat(BubbleOpacity, Mathf.Lerp(holdOpacity, 0f, t));
             runtimeMaterial.SetFloat(RiseSpeed, NormalRiseSpeed);
             yield return null;
         }
 
+        Debug.Log($"[BubbleOverlayController] Ending _RiseSpeed={runtimeMaterial.GetFloat(RiseSpeed):F3}, _BubbleTime={bubbleTime:F3}.", this);
         ApplyIdleState();
         LogMaterialState("end");
         transitionCoroutine = null;
@@ -149,9 +168,12 @@ public sealed class BubbleOverlayController : MonoBehaviour
     private void ApplyTransitionDefaults()
     {
         runtimeMaterial.SetColor(BubbleTint, bubbleTint);
-        runtimeMaterial.SetFloat(BubbleDensity, 0f);
+        runtimeMaterial.SetFloat(BubbleDensity, bubbleDensity);
+        runtimeMaterial.SetFloat(BubbleTime, 0f);
         runtimeMaterial.SetFloat(BubbleScale, bubbleScale);
-        runtimeMaterial.SetFloat(RiseSpeed, IntroRiseSpeed);
+        runtimeMaterial.SetFloat(RiseSpeed, NormalRiseSpeed);
+        runtimeMaterial.SetFloat(MinBubbleSpeed, DefaultMinBubbleSpeed);
+        runtimeMaterial.SetFloat(MaxBubbleSpeed, DefaultMaxBubbleSpeed);
         runtimeMaterial.SetFloat(AutoMove, 1f);
         runtimeMaterial.SetFloat(BubbleOpacity, 0f);
     }
@@ -165,8 +187,11 @@ public sealed class BubbleOverlayController : MonoBehaviour
 
         runtimeMaterial.SetColor(BubbleTint, bubbleTint);
         runtimeMaterial.SetFloat(BubbleDensity, 0f);
+        runtimeMaterial.SetFloat(BubbleTime, 0f);
         runtimeMaterial.SetFloat(BubbleScale, bubbleScale);
         runtimeMaterial.SetFloat(RiseSpeed, NormalRiseSpeed);
+        runtimeMaterial.SetFloat(MinBubbleSpeed, DefaultMinBubbleSpeed);
+        runtimeMaterial.SetFloat(MaxBubbleSpeed, DefaultMaxBubbleSpeed);
         runtimeMaterial.SetFloat(AutoMove, 1f);
         runtimeMaterial.SetFloat(BubbleOpacity, 0f);
     }
@@ -192,6 +217,7 @@ public sealed class BubbleOverlayController : MonoBehaviour
         float minBubbleSpeed = runtimeMaterial.HasProperty(MinBubbleSpeed) ? runtimeMaterial.GetFloat(MinBubbleSpeed) : float.NaN;
         float maxBubbleSpeed = runtimeMaterial.HasProperty(MaxBubbleSpeed) ? runtimeMaterial.GetFloat(MaxBubbleSpeed) : float.NaN;
         float shaderTime = runtimeMaterial.HasProperty(ITime) ? runtimeMaterial.GetFloat(ITime) : float.NaN;
+        float bubbleTime = runtimeMaterial.HasProperty(BubbleTime) ? runtimeMaterial.GetFloat(BubbleTime) : float.NaN;
 
         Debug.Log(
             $"[BubbleOverlayController] Material state ({label}): " +
@@ -201,6 +227,7 @@ public sealed class BubbleOverlayController : MonoBehaviour
             $"minBubbleSpeed={minBubbleSpeed:F3}, " +
             $"maxBubbleSpeed={maxBubbleSpeed:F3}, " +
             $"iTime={shaderTime:F3}, " +
+            $"bubbleTime={bubbleTime:F3}, " +
             $"rawImageEnabled={overlayImage.enabled}, " +
             $"rawImageAlpha={overlayImage.color.a:F3}, " +
             $"raycastTarget={overlayImage.raycastTarget}, " +

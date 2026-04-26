@@ -6,16 +6,20 @@ Shader "Custom/ShaderToyBubbleOverlay"
         _Color ("UI Tint", Color) = (1, 1, 1, 1)
 
         _iTime ("ShaderToy Time", Float) = 0
+        _BubbleTime ("Bubble Local Time", Float) = 0
+        _BubbleTravelTime ("Bubble Travel Time", Range(0.5, 5)) = 0.9
+        _BubbleSpawnWindow ("Bubble Spawn Window", Range(0, 2)) = 0.7
+        _BubbleStartOffset ("Bubble Start Offset", Range(0, 2)) = 0.2
         _iResolution ("ShaderToy Resolution", Vector) = (1920, 1080, 0, 0)
 
         _BubbleTint ("Bubble Tint", Color) = (1.0, 1.0, 1.0, 1.0)
-        _BubbleOpacity ("Bubble Opacity", Range(0, 2)) = 1.0
-        _BubbleDensity ("Bubble Density", Range(0, 1)) = 1.0
+        _BubbleOpacity ("Bubble Opacity", Range(0, 2)) = 0.0
+        _BubbleDensity ("Bubble Density", Range(0, 1)) = 0.0
         _AutoMove ("Auto Move", Range(0, 1)) = 1.0
-        _RiseSpeed ("Auto Rise Speed", Range(0, 3)) = 0.35
-        _MinBubbleSpeed ("Min Bubble Speed", Range(0.01, 1)) = 0.05
-        _MaxBubbleSpeed ("Max Bubble Speed", Range(0.01, 1)) = 0.16
-        _EdgeFade ("Edge Fade", Range(0.01, 0.5)) = 0.20
+        _RiseSpeed ("Auto Rise Speed", Range(0, 3)) = 1.0
+        _MinBubbleSpeed ("Min Bubble Speed", Range(0.01, 2)) = 0.8
+        _MaxBubbleSpeed ("Max Bubble Speed", Range(0.01, 2)) = 1.3
+        _EdgeFade ("Edge Fade", Range(0.01, 0.5)) = 0.18
         _BubbleScale ("Bubble Scale", Range(0.25, 4)) = 1.0
         _BubbleIntensity ("Bubble Intensity", Range(0, 4)) = 1.5
         _AlphaPower ("Alpha Sharpness", Range(0.25, 4)) = 1.0
@@ -70,6 +74,10 @@ Shader "Custom/ShaderToyBubbleOverlay"
                 half4 _Color;
 
                 float _iTime;
+                float _BubbleTime;
+                float _BubbleTravelTime;
+                float _BubbleSpawnWindow;
+                float _BubbleStartOffset;
                 float4 _iResolution;
 
                 half4 _BubbleTint;
@@ -100,32 +108,6 @@ Shader "Custom/ShaderToyBubbleOverlay"
             float2 Mod2(float2 p, float c)
             {
                 return p - c * floor(p / c);
-            }
-
-            float2 Hash2a(float2 x, float anim)
-            {
-                float r = 523.0 * sin(dot(x, float2(53.3158, 43.6143)));
-
-                float xa1 = frac(anim);
-                float xb1 = anim - xa1;
-
-                anim += 0.5;
-
-                float xa2 = frac(anim);
-                float xb2 = anim - xa2;
-
-                float2 z1 = float2(frac(15.32354 * (r + xb1)), frac(17.25865 * (r + xb1)));
-                r += 1.0;
-
-                float2 z2 = float2(frac(15.32354 * (r + xb1)), frac(17.25865 * (r + xb1)));
-                r += 1.0;
-
-                float2 z3 = float2(frac(15.32354 * (r + xb2)), frac(17.25865 * (r + xb2)));
-                r += 1.0;
-
-                float2 z4 = float2(frac(15.32354 * (r + xb2)), frac(17.25865 * (r + xb2)));
-
-                return (lerp(z1, z2, xa1) + lerp(z3, z4, xa2)) * 0.5;
             }
 
             float HashNull(float2 x)
@@ -273,18 +255,26 @@ Shader "Custom/ShaderToyBubbleOverlay"
                             continue;
                         }
 
-                        float randomPhase = HashNull(hashBase);
-                        float randomSpeed = lerp(minSpeed, maxSpeed, HashNull(hashBase + 17.0));
+                        float randomDelay = HashNull(hashBase) * _BubbleSpawnWindow;
+                        float randomSpeedMultiplier = lerp(minSpeed, maxSpeed, HashNull(hashBase + 17.0));
                         float randomX = lerp(0.14, 0.86, HashNull(hashBase + 29.0));
+                        float localTime = _BubbleTime - randomDelay;
+                        float progress = localTime / max(_BubbleTravelTime, 0.001);
 
-                        float progress = frac(_iTime * _RiseSpeed * randomSpeed + randomPhase);
-                        float bubbleY = lerp(-edgeFade, 1.0 + edgeFade, progress);
+                        if (progress < 0.0 || progress > 1.0)
+                        {
+                            continue;
+                        }
+
+                        float riseProgress = saturate(progress * _RiseSpeed * randomSpeedMultiplier);
+                        float bubbleY = lerp(-_BubbleStartOffset, 1.0 + edgeFade, riseProgress);
 
                         float2 tp = cellId + float2(randomX, bubbleY);
 
-                        float2 sway = Hash2a(hashBase + 43.0, _iTime * (0.06 + randomSpeed * 0.15)) - 0.5;
-                        tp.x += sway.x * 0.18;
-                        tp.y += sway.y * 0.05;
+                        float swayPhase = HashNull(hashBase + 43.0) * 6.28318;
+                        float swaySpeed = lerp(0.6, 1.2, HashNull(hashBase + 44.0));
+                        float swayAmount = lerp(0.015, 0.045, HashNull(hashBase + 45.0));
+                        tp.x += sin(_BubbleTime * swaySpeed + swayPhase) * swayAmount;
 
                         float2 l = inp - tp;
                         float dr = dot(l, l);
@@ -294,8 +284,8 @@ Shader "Custom/ShaderToyBubbleOverlay"
                             d = dr;
                             pos = tp;
 
-                            float fadeIn = smoothstep(-edgeFade, 0.0, bubbleY);
-                            float fadeOut = 1.0 - smoothstep(1.0, 1.0 + edgeFade, bubbleY);
+                            float fadeIn = smoothstep(0.0, 0.12, progress);
+                            float fadeOut = 1.0 - smoothstep(0.82, 1.0, progress);
                             bubbleEdgeFade = saturate(fadeIn * fadeOut);
                         }
                     }

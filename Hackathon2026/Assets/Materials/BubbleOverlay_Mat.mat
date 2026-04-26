@@ -31,14 +31,18 @@ Material:
     m_Floats:
     - _AlphaPower: 1
     - _AutoMove: 1
-    - _BubbleDensity: 1
+    - _BubbleDensity: 0
     - _BubbleIntensity: 1.5
-    - _BubbleOpacity: 1
+    - _BubbleOpacity: 0
     - _BubbleScale: 1
-    - _EdgeFade: 0.2
-    - _MaxBubbleSpeed: 0.32
-    - _MinBubbleSpeed: 0.1
-    - _RiseSpeed: 0.7
+    - _BubbleSpawnWindow: 0.7
+    - _BubbleStartOffset: 0.2
+    - _BubbleTime: 0
+    - _BubbleTravelTime: 0.9
+    - _EdgeFade: 0.18
+    - _MaxBubbleSpeed: 1.3
+    - _MinBubbleSpeed: 0.8
+    - _RiseSpeed: 1
     - _iTime: 8.205278
   m_Colors:
     - _BubbleTint: {r: 1, g: 1, b: 1, a: 1}
