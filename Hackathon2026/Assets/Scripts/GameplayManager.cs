@@ -182,9 +182,12 @@ public class GameplayManager : MonoBehaviour
         if (currentValue == currentLevel.targetValue)
         {
             feedbackText.text = "Correct. x reached the target.";
-            GetBubbleOverlayController()?.PlayTransition("Level Complete");
+            BubbleOverlayController controller = GetBubbleOverlayController();
+            if (controller != null)
+            {
+                controller.PlayTransition("Level Complete");
+            }
             UnlockNextLevel();
-            BubbleManager.StartBubbles();
         }
         else
         {
