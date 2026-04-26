@@ -176,6 +176,7 @@ public class GameplayManager : MonoBehaviour
         {
             feedbackText.text = "Correct. x reached the target.";
             UnlockNextLevel();
+            BubbleManager.StartBubbles();
         }
         else
         {
