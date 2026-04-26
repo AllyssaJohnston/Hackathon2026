@@ -6,12 +6,12 @@ public class PlayerData : MonoBehaviour
     private const string LevelsUnlockedKey = "LevelsUnlocked";
     private const string CurrentLevelKey = "CurrentLevel";
     private const string SFXOnKey = "SFXOn";
-    private const string TextSizeKey = "TextSize";
 
     public void Start()
     {
-        if (init == false)
+        if (!init)
         {
+            SFXOn = true;
             ResetProgress();
             init = true;
         }
@@ -33,12 +33,6 @@ public class PlayerData : MonoBehaviour
     {
         get { return PlayerPrefs.GetInt(SFXOnKey, 1) == 1; }
         set { PlayerPrefs.SetInt(SFXOnKey, value ? 1 : 0); }
-    }
-
-    public static int TextSize
-    {
-        get { return PlayerPrefs.GetInt(TextSizeKey, 1); }
-        set { PlayerPrefs.SetInt(TextSizeKey, Mathf.Clamp(value, 0, 2)); }
     }
 
     public static void Save()
