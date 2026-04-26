@@ -1,6 +1,6 @@
 # Code in 8  
 
-Demo: https://allyssajohnston.github.io/Hackathon2026/  
+[Demo](https://allyssajohnston.github.io/Hackathon2026/)
 
 Providing fun building blocks puzzles for learning to code  
 
