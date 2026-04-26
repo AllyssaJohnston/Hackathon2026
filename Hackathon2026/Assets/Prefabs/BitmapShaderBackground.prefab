@@ -1,4 +1,4 @@
-﻿%YAML 1.1
+%YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
 --- !u!1 &8478942339173599615
 GameObject:
@@ -87,4 +87,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShaderToyDriver
   shaderPreview: {fileID: 1835395873899117394}
   shaderMaterial: {fileID: 2100000, guid: 16894fddd190e7049ac7b64c51de1732, type: 2}
-
