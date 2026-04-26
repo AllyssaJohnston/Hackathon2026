@@ -55,6 +55,7 @@ public class LevelSelectUI : MonoBehaviour
             return;
         }
 
+        SFXManager.Instance.PlayUIPress();
         SceneTransitionManager.Instance.LoadSceneAfterAction(
             "Gameplay",
             () =>
@@ -71,6 +72,7 @@ public class LevelSelectUI : MonoBehaviour
             return;
         }
 
+        SFXManager.Instance.PlayUIPress();
         SceneTransitionManager.Instance.LoadScene("StartMenu");
     }
 }
