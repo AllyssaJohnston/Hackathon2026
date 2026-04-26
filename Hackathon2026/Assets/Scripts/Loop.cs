@@ -19,13 +19,28 @@ public class Loop : MonoBehaviour
 
     public int Compute(int inputVar)
     {
-        loopString = "";
         for (int i = 0; i < numRepeat; i++)
         {
-            foreach(Equation eq in equations)
+            if (numRepeat == 1)
             {
-                inputVar = eq.Compute(inputVar);
-                loopString += eq.equation;
+                loopString = "";
+            }
+            else
+            {
+                loopString = "for (int i = 0; i < " + numRepeat.ToString() + "; i++) {\n";
+            }
+            for (int j = 0; j < equations.Count; j++)
+            {
+                inputVar = equations[j].Compute(inputVar);
+                loopString += equations[j].equation;
+                if (j < equations.Count - 1)
+                {
+                    loopString += "\n";
+                }
+            }
+            if (numRepeat != 1)
+            {
+                loopString += "}";
             }
         }
         return inputVar;

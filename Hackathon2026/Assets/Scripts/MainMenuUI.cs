@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class MainMenuUI : MonoBehaviour
@@ -32,13 +31,7 @@ public class MainMenuUI : MonoBehaviour
         return true;
     }
 
-    private void Play()
-    {
-        SceneManager.LoadScene("LevelSelect");
-    }
+    private void Play() { SceneTransitionManager.Instance.LoadScene("LevelSelect"); }
 
-    private void Quit()
-    {
-        Application.Quit();
-    }
+    private void Quit() { Application.Quit(); }
 }

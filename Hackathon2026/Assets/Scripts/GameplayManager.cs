@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 [System.Serializable]
@@ -213,14 +212,22 @@ public class GameplayManager : MonoBehaviour
 
     private void ShowHint() { feedbackText.text = currentLevel.hint; }
 
-    private void BackToLevelSelect() { SceneManager.LoadScene("LevelSelect"); }
+    private void BackToLevelSelect()
+    {
+        if (SceneTransitionManager.Instance.IsTransitioning)
+        {
+            return;
+        }
+
+        SceneTransitionManager.Instance.LoadScene("LevelSelect");
+    }
 
     private void RefreshUI()
     {
         levelNumberText.text = "Level " + currentLevelNumber;
-        startValueText.text = "Start Value: " + currentLevel.startValue;
-        targetValueText.text = "Target Value: " + currentLevel.targetValue;
-        currentValueText.text = "Current Value: " + currentValue;
+        startValueText.text =  currentLevel.startValue.ToString();
+        targetValueText.text = currentLevel.targetValue.ToString();
+        currentValueText.text = currentValue.ToString();
     }
 
     // set the input block the mouse is currently hovering over
