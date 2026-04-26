@@ -1,67 +1,126 @@
-﻿using UnityEngine;
+using UnityEngine;
 
+[RequireComponent(typeof(AudioSource))]
 public sealed class BackgroundMusicBootstrap : MonoBehaviour
 {
     private const string MusicObjectName = "BackgroundMusic";
-    private const string ResourceClipName = "mainmusic";
+    private const string ResourceClipName = "mainmusic_v2";
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    private static BackgroundMusicBootstrap instance;
+
+    private AudioSource musicSource;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics()
+    {
+        instance = null;
+    }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void EnsureBackgroundMusic()
     {
-        AudioSource existingSource = Object.FindFirstObjectByType<AudioSource>();
-        if (existingSource != null && existingSource.gameObject.name == MusicObjectName)
+        if (instance != null)
         {
-            if (PlayerData.SFXOn)
-            {
-                if (!existingSource.isPlaying && existingSource.clip != null)
-                {
-                    Debug.Log("play");
-                    existingSource.Play();
-                }
-            }
-            else
-            {
-                Debug.Log("stop");
-                existingSource.Stop();
-            }
-
-           return;
+            instance.ApplyPlaybackState();
+            return;
         }
 
+        BackgroundMusicBootstrap existingInstance = FindFirstObjectByType<BackgroundMusicBootstrap>();
+
+        if (existingInstance != null)
+        {
+            instance = existingInstance;
+            instance.Initialize();
+            instance.ApplyPlaybackState();
+            return;
+        }
+
+        GameObject musicObject = new GameObject(MusicObjectName);
+        instance = musicObject.AddComponent<BackgroundMusicBootstrap>();
+        instance.Initialize();
+    }
+
+    private void Awake()
+    {
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        instance = this;
+        Initialize();
+    }
+
+    private void Initialize()
+    {
+        if (instance != null && instance != this)
+        {
+            return;
+        }
+
+        if (musicSource == null)
+        {
+            musicSource = GetComponent<AudioSource>();
+        }
+
+        gameObject.name = MusicObjectName;
+        DontDestroyOnLoad(gameObject);
+
         AudioClip clip = Resources.Load<AudioClip>(ResourceClipName);
+
         if (clip == null)
         {
             Debug.LogWarning($"Background music clip '{ResourceClipName}' was not found in Resources.");
             return;
         }
 
-        GameObject musicObject = new GameObject(MusicObjectName);
-        Object.DontDestroyOnLoad(musicObject);
+        musicSource.Stop();
+        musicSource.clip = clip;
+        musicSource.time = 0f;
+        musicSource.loop = true;
+        musicSource.playOnAwake = false;
+        musicSource.spatialBlend = 0f;
+        musicSource.volume = 1f;
+        musicSource.ignoreListenerPause = true;
+        musicSource.ignoreListenerVolume = false;
 
-        AudioSource audioSource = musicObject.AddComponent<AudioSource>();
-        audioSource.clip = clip;
-        audioSource.loop = true;
-        audioSource.playOnAwake = true;
-        audioSource.spatialBlend = 0f;
-        audioSource.volume = 1f;
-        audioSource.ignoreListenerPause = true;
-        audioSource.ignoreListenerVolume = false;
-        audioSource.Play();
-
-        musicObject.AddComponent<BackgroundMusicBootstrap>();
+        ApplyPlaybackState();
     }
 
     public static void ToggleMusic()
     {
-        Debug.Log("called");
-        AudioSource existingSource = Object.FindFirstObjectByType<AudioSource>();
+        if (instance == null)
+        {
+            EnsureBackgroundMusic();
+        }
+
+        if (instance == null)
+        {
+            Debug.LogError("BackgroundMusicBootstrap could not find or create a music instance.");
+            return;
+        }
+
+        instance.ApplyPlaybackState();
+    }
+
+    private void ApplyPlaybackState()
+    {
+        if (musicSource == null || musicSource.clip == null)
+        {
+            return;
+        }
+
+        musicSource.loop = true;
+
         if (PlayerData.SFXOn)
         {
-            existingSource.Play();
+            musicSource.loop = true;
+            musicSource.Play();
         }
         else
         {
-            existingSource.Stop();
+            musicSource.Stop();
         }
     }
 }
