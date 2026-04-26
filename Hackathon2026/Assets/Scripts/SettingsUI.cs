@@ -18,7 +18,7 @@ public class SettingsUI : MonoBehaviour
 
         toggleSFXButton.onClick.AddListener(ToggleSFX);
         resetProgressButton.onClick.AddListener(ResetProgress);
-        backButton.onClick.AddListener(HideWithSfx);
+        backButton.onClick.AddListener(Hide);
 
         settingsPanel.SetActive(false);
         RefreshLabels();
@@ -61,35 +61,16 @@ public class SettingsUI : MonoBehaviour
 
     private void ToggleSFX()
     {
-        bool wasEnabled = PlayerData.SFXOn;
-
-        if (wasEnabled)
-        {
-            SFXManager.Instance.PlayUIPress();
-        }
-
         PlayerData.SFXOn = !PlayerData.SFXOn;
         PlayerData.Save();
         BackgroundMusicBootstrap.ToggleMusic();
         RefreshLabels();
-
-        if (!wasEnabled && PlayerData.SFXOn)
-        {
-            SFXManager.Instance.PlayUIPress();
-        }
     }
 
     private void ResetProgress()
     {
-        SFXManager.Instance.PlayUIPress();
         PlayerData.ResetProgress();
         RefreshLabels();
-    }
-
-    public void HideWithSfx()
-    {
-        SFXManager.Instance.PlayUIPress();
-        Hide();
     }
 
     private void RefreshLabels()

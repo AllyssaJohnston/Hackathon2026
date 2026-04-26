@@ -12,36 +12,18 @@ public sealed class ShaderToyDriver : MonoBehaviour
 
     [SerializeField] private RawImage shaderPreview;
     [SerializeField] private Material shaderMaterial;
-    private Material runtimeMaterial;
 
     private void Awake()
     {
-        if (shaderPreview == null)
-        {
-            shaderPreview = GetComponent<RawImage>();
-        }
-
-        if (shaderPreview != null && shaderPreview.material == null && shaderMaterial != null)
+        if (shaderPreview != null && shaderMaterial != null)
         {
             shaderPreview.material = shaderMaterial;
-        }
-
-        runtimeMaterial = shaderPreview != null ? shaderPreview.material : null;
-    }
-
-    public void SetRuntimeMaterial(Material material)
-    {
-        runtimeMaterial = material;
-
-        if (shaderPreview != null && material != null)
-        {
-            shaderPreview.material = material;
         }
     }
 
     private void Update()
     {
-        if (shaderPreview == null)
+        if (shaderPreview == null || shaderPreview.material == null)
         {
             return;
         }
@@ -58,19 +40,10 @@ public sealed class ShaderToyDriver : MonoBehaviour
             IsMousePressed() ? 1f : 0f,
             0f);
 
-        if (runtimeMaterial == null || shaderPreview.material != runtimeMaterial)
-        {
-            runtimeMaterial = shaderPreview.material;
-        }
-
-        if (runtimeMaterial == null)
-        {
-            return;
-        }
-
-        runtimeMaterial.SetFloat(ITime, Time.unscaledTime);
-        runtimeMaterial.SetVector(IResolution, new Vector4(resolution.x, resolution.y, 0f, 0f));
-        runtimeMaterial.SetVector(IMouse, shaderMouse);
+        Material material = shaderPreview.material;
+        material.SetFloat(ITime, Time.time);
+        material.SetVector(IResolution, new Vector4(resolution.x, resolution.y, 0f, 0f));
+        material.SetVector(IMouse, shaderMouse);
     }
 
     private static Vector2 GetMousePosition()
