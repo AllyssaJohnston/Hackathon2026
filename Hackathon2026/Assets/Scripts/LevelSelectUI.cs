@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class LevelSelectUI : MonoBehaviour
@@ -17,8 +16,8 @@ public class LevelSelectUI : MonoBehaviour
         for (int i = 0; i < levelButtons.Length; i++)
         {
             int levelNumber = i + 1;
-            levelButtons[i].interactable = levelNumber <= PlayerData.LevelsUnlocked;
-            levelButtons[i].onClick.AddListener(delegate { OpenLevel(levelNumber); });
+            levelButtons[i].interactable = PlayerData.LevelsUnlocked >= levelNumber;
+            levelButtons[i].onClick.AddListener(delegate { LoadLevel(levelNumber); });
         }
 
         backButton.onClick.AddListener(BackToStartMenu);
@@ -44,15 +43,34 @@ public class LevelSelectUI : MonoBehaviour
         return true;
     }
 
-    private void OpenLevel(int levelNumber)
+    public void LoadLevel(int levelNumber)
     {
-        PlayerData.CurrentLevel = levelNumber;
-        PlayerData.Save();
-        SceneManager.LoadScene("Gameplay");
+        if (SceneTransitionManager.Instance.IsTransitioning)
+        {
+            return;
+        }
+
+        if (PlayerData.LevelsUnlocked < levelNumber)
+        {
+            return;
+        }
+
+        SceneTransitionManager.Instance.LoadSceneAfterAction(
+            "Gameplay",
+            () =>
+            {
+                PlayerData.CurrentLevel = levelNumber;
+                PlayerData.Save();
+            });
     }
 
     private void BackToStartMenu()
     {
-        SceneManager.LoadScene("StartMenu");
+        if (SceneTransitionManager.Instance.IsTransitioning)
+        {
+            return;
+        }
+
+        SceneTransitionManager.Instance.LoadScene("StartMenu");
     }
 }
