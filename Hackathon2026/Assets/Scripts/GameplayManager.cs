@@ -16,6 +16,7 @@ public struct Level
 public class GameplayManager : MonoBehaviour
 {
     public static bool init = false;
+    [SerializeField] private BubbleOverlayController bubbleOverlayController;
     [SerializeField] private Text levelNumberText;
     [SerializeField] private Text startValueText;
     [SerializeField] private Text targetValueText;
@@ -52,6 +53,11 @@ public class GameplayManager : MonoBehaviour
     private void Awake()
     {
         if (!HasRequiredReferences()) { return; }
+
+        if (bubbleOverlayController == null)
+        {
+            bubbleOverlayController = FindFirstObjectByType<BubbleOverlayController>();
+        }
 
         if (!init)
         {
@@ -164,6 +170,7 @@ public class GameplayManager : MonoBehaviour
 
     private void RunCode()
     {
+        SFXManager.Instance.PlayUIPress();
         logger.DeleteTextBox();
         currentValue = currentLevel.startValue;
         for (int i = 0; i < numSelectedBlocks; i++)
@@ -175,8 +182,12 @@ public class GameplayManager : MonoBehaviour
         if (currentValue == currentLevel.targetValue)
         {
             feedbackText.text = "Correct. x reached the target.";
+            BubbleOverlayController controller = GetBubbleOverlayController();
+            if (controller != null)
+            {
+                controller.PlayTransition("Level Complete");
+            }
             UnlockNextLevel();
-            BubbleManager.StartBubbles();
         }
         else
         {
@@ -198,6 +209,7 @@ public class GameplayManager : MonoBehaviour
 
     private void ResetLevel()
     {
+        SFXManager.Instance.PlayUIPress();
         numSelectedBlocks = 0;
         numSelectedLines = 0;
         selectedBlockPos = Vector3.zero;
@@ -211,7 +223,11 @@ public class GameplayManager : MonoBehaviour
         RefreshUI();
     }
 
-    private void ShowHint() { feedbackText.text = currentLevel.hint; }
+    private void ShowHint()
+    {
+        SFXManager.Instance.PlayUIPress();
+        feedbackText.text = currentLevel.hint;
+    }
 
     private void BackToLevelSelect()
     {
@@ -220,6 +236,7 @@ public class GameplayManager : MonoBehaviour
             return;
         }
 
+        SFXManager.Instance.PlayUIPress();
         SceneTransitionManager.Instance.LoadScene("LevelSelect");
     }
 
@@ -229,6 +246,16 @@ public class GameplayManager : MonoBehaviour
         startValueText.text =  currentLevel.startValue.ToString();
         targetValueText.text = currentLevel.targetValue.ToString();
         currentValueText.text = currentValue.ToString();
+    }
+
+    private BubbleOverlayController GetBubbleOverlayController()
+    {
+        if (bubbleOverlayController == null)
+        {
+            bubbleOverlayController = FindFirstObjectByType<BubbleOverlayController>();
+        }
+
+        return bubbleOverlayController;
     }
 
     // set the input block the mouse is currently hovering over
@@ -261,6 +288,7 @@ public class GameplayManager : MonoBehaviour
             selectedBlocks[numSelectedBlocks] = newEq;
             numSelectedBlocks++;
             numSelectedLines += numLines;
+            SFXManager.Instance.PlayBlockPress();
         }
     }
 }
