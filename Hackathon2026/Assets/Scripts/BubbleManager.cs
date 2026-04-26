@@ -18,4 +18,11 @@ public class BubbleManager : MonoBehaviour
     {
         
     }
+
+    public static void StartBubbles()
+    {
+        instance.bubble1.Play();
+        instance.bubble2.Play();
+        instance.bubble3.Play();
+    }
 }

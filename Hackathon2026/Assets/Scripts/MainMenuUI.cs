@@ -16,7 +16,7 @@ public class MainMenuUI : MonoBehaviour
         }
 
         playButton.onClick.AddListener(Play);
-        settingsButton.onClick.AddListener(ShowSettings);
+        settingsButton.onClick.AddListener(settingsUI.Show);
         quitButton.onClick.AddListener(Quit);
     }
 
@@ -31,21 +31,7 @@ public class MainMenuUI : MonoBehaviour
         return true;
     }
 
-    private void Play()
-    {
-        SFXManager.Instance.PlayUIPress();
-        SceneTransitionManager.Instance.LoadScene("LevelSelect");
-    }
+    private void Play() { SceneTransitionManager.Instance.LoadScene("LevelSelect"); }
 
-    private void ShowSettings()
-    {
-        SFXManager.Instance.PlayUIPress();
-        settingsUI.Show();
-    }
-
-    private void Quit()
-    {
-        SFXManager.Instance.PlayUIPress();
-        Application.Quit();
-    }
+    private void Quit() { Application.Quit(); }
 }
