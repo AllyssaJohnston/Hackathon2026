@@ -1,5 +1,7 @@
 # Code in 8  
 
+Demo: https://allyssajohnston.github.io/Hackathon2026/  
+
 Providing fun building blocks puzzles for learning to code  
 
 Project created in 72 hours for the UWB Hacks: The Future hackathon  
