@@ -63,6 +63,7 @@ public class SettingsUI : MonoBehaviour
     {
         PlayerData.SFXOn = !PlayerData.SFXOn;
         PlayerData.Save();
+        BackgroundMusicBootstrap.ToggleMusic();
         RefreshLabels();
     }
 

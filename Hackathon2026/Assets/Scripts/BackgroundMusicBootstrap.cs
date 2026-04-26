@@ -8,19 +8,24 @@ public sealed class BackgroundMusicBootstrap : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void EnsureBackgroundMusic()
     {
-        if (Object.FindFirstObjectByType<BackgroundMusicBootstrap>() != null)
-        {
-            return;
-        }
-
         AudioSource existingSource = Object.FindFirstObjectByType<AudioSource>();
         if (existingSource != null && existingSource.gameObject.name == MusicObjectName)
         {
-            if (!existingSource.isPlaying && existingSource.clip != null)
+            if (PlayerData.SFXOn)
             {
-                existingSource.Play();
+                if (!existingSource.isPlaying && existingSource.clip != null)
+                {
+                    Debug.Log("play");
+                    existingSource.Play();
+                }
             }
-            return;
+            else
+            {
+                Debug.Log("stop");
+                existingSource.Stop();
+            }
+
+           return;
         }
 
         AudioClip clip = Resources.Load<AudioClip>(ResourceClipName);
@@ -44,5 +49,19 @@ public sealed class BackgroundMusicBootstrap : MonoBehaviour
         audioSource.Play();
 
         musicObject.AddComponent<BackgroundMusicBootstrap>();
+    }
+
+    public static void ToggleMusic()
+    {
+        Debug.Log("called");
+        AudioSource existingSource = Object.FindFirstObjectByType<AudioSource>();
+        if (PlayerData.SFXOn)
+        {
+            existingSource.Play();
+        }
+        else
+        {
+            existingSource.Stop();
+        }
     }
 }

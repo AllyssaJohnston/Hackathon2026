@@ -32,13 +32,7 @@ public class MainMenuUI : MonoBehaviour
         return true;
     }
 
-    private void Play()
-    {
-        SceneManager.LoadScene("LevelSelect");
-    }
+    private void Play() { SceneManager.LoadScene("LevelSelect"); }
 
-    private void Quit()
-    {
-        Application.Quit();
-    }
+    private void Quit() { Application.Quit(); }
 }
